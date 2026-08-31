@@ -1,0 +1,76 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "halluc-detect"
+version = "0.2.0"
+description = "Agent trajectory hallucination detector — fast tier is pure-stdlib, 0 LLM/0 search. Bilingual (CN+EN) marker lexicon + Chinese multi-domain benchmark."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "HallucC"}]
+keywords = [
+    "hallucination",
+    "agent",
+    "trajectory",
+    "eval",
+    "llm",
+    "chinese",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "License :: OSI Approved :: MIT License",
+    "Intended Audience :: Developers",
+]
+# fast 档纯 stdlib，0 依赖——这是 B 旗舰"0 API quota"获客卖点的前提。
+# 解耦后 import agent_pipeline 不再拖入 server/config/llm/search 重栈。
+dependencies = []
+
+[project.optional-dependencies]
+# standard/deep 档裁判层 LLMClient 依赖（fast 档不需要）
+llm = [
+    "openai>=1.30.0",
+    "python-dotenv>=1.0.1",
+    "requests>=2.31.0",
+]
+# nli_model 语义蕴含（observation↔claim 矛盾判定，Jaccard 漏判时补位）
+nli = [
+    "sentence-transformers>=2.5",
+    "numpy>=1.24",
+]
+# HallucC 全栈 server（pip 打包时不含，仅供本地开发一并装齐）
+server = [
+    "fastapi>=0.110.0",
+    "uvicorn[standard]>=0.29.0",
+    "python-multipart>=0.0.9",
+    "python-docx>=1.1.0",
+    "pypdf>=4.0.0",
+    "redis>=5.0",
+    "reportlab>=4.0",
+    "alibabacloud-dysmsapi20170525>=4.0.0",
+    "alibabacloud-dypnsapi20170525>=2.0.0",
+]
+
+[project.scripts]
+halluc-detect = "halluc_detect:main"
+
+[tool.setuptools]
+# 仅打包 10 个检测器模块——pipeline/config/llm/search/server 不入 wheel，
+# 保持 fast 档精简。开发仓库内 pip install -e . 仍经 repo-root-on-path 访问全栈。
+py-modules = [
+    "halluc_detect",
+    "common_sense",
+    "failure_mode_codes",
+    "agent_eval",
+    "agent_pipeline",
+    "agent_benchmark",
+    "failure_modes",
+    "math_checker",
+    "log_utils",
+    "nli_model",
+]
