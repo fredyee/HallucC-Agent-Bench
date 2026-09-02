@@ -17,4 +17,18 @@ venv/
 # secrets / env（公开仓库，绝不提交密钥）
 .env
 .env.*
+.envrc
+
+# SaaS 闭源模块（open-core 边界：fast 档开源，以下为生产服务端 / 标准+深度档裁判 prompt）
+# 绝不提交——泄露即丢壁垒。若误放入本目录，gitignore 在此硬拦截。
+prompts.py
+config.py
+annotation.py
+search.py
+pipeline.py
+guard_agent.py
+domains.py
+server.py
+app.py
+
 
