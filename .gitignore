@@ -13,3 +13,8 @@ venv/
 .DS_Store
 .idea/
 .vscode/
+
+# secrets / env（公开仓库，绝不提交密钥）
+.env
+.env.*
+

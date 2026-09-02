@@ -12,9 +12,10 @@ LOOP / OVERCONFIDENT_ASSERTION / PREMATURE_STOP）之外的 5 种失败模式：
 设计原则（CLAUDE.md）：控制误报——证据不足不报；与 LOOP 互斥（LOOP 由 agent_eval 处理，
 REDUNDANT_STEP 跳过同 action+input 的步骤对）。
 """
+import json
 import re
 
-from agent_eval import _text_similarity
+from agent_eval import _text_similarity, _norm_action_input
 from log_utils import get_logger
 
 logger = get_logger(__name__)
@@ -140,50 +141,129 @@ def _asserts_success(claim: str) -> bool:
     return _match_markers(c, "claim_assert")
 
 
-# ============================ 逐步探测器 ============================
+# 独立 0 值：前后非数字/小数点——只匹配 "0元"/"0条"，不收 "10"/"30"/"0.5" 里的 0
+_ZERO_VALUE_RE = re.compile(r"(?<![\d.])0+(?![\d.])")
+# 任意数字（含小数/百分比）——判 claim 是否断言正数
+_NUM_RE = re.compile(r"-?\d+\.?\d*%?")
 
-def detect_param_fabrication(step: int, action_input: str, context_text: str) -> list[dict]:
-    """参数凭空捏造：action_input 含刚性 ID，但 task/前序观察与声称中无来源。
 
-    context_text 由调用方拼接（task + 前序 obs/claim；不含当前步 obs——
-    当前步 obs 是本次调用结果，agent 调用前不可能已知）。
+def _has_zero_value(text: str) -> bool:
+    """text 含独立 0 值（软失败：余额0元/结果0条）——非算式操作数里的 0。"""
+    return bool(_ZERO_VALUE_RE.search(text or ""))
+
+
+def _has_positive_number(text: str) -> bool:
+    """text 含正数（>0）——claim 断言了具体正向数值。"""
+    for m in _NUM_RE.finditer(text or ""):
+        try:
+            if float(m.group().rstrip("%")) > 0:
+                return True
+        except ValueError:
+            continue
+    return False
+
+
+def _extract_string_param_values(action_input: str) -> list[str]:
+    """从 action_input JSON 提取 string 参数值（非刚性 ID 的普通字符串参数）。
+
+    供 param_fabrication 非刚性 ID 路径：识别「查询了某城市名/姓名但 obs 未找到」。
     """
     ai = _norm(action_input)
     if not ai:
         return []
-    ctx = _norm(context_text)
+    try:
+        params = json.loads(ai.strip())
+        if isinstance(params, dict):
+            return [str(v) for v in params.values() if isinstance(v, str) and v]
+    except (json.JSONDecodeError, ValueError):
+        pass
+    return []
+
+
+# ============================ 逐步探测器 ============================
+
+def detect_param_fabrication(
+    step: int, action_input: str, context_text: str,
+    *, observation: str = "", claim: str = "",
+) -> list[dict]:
+    """参数凭空捏造：action_input 含刚性 ID，但 task/前序观察与声称中无来源。
+
+    context_text 由调用方拼接（task + 前序 obs/claim；不含当前步 obs——
+    当前步 obs 是本次调用结果，agent 调用前不可能已知）。
+
+    扩展（非刚性 ID 路径，F 例）：obs 含失败标记（未找到/无此）且 claim 仍断言
+    查询的字符串参数值 → PARAM_FABRICATION。刚性 ID 由主路径处理；本路径只收
+    非刚性 ID 的普通字符串值（城市名/姓名等），len≥2 避免单字符误报。
+    observation/claim 为 keyword-only 可选参数，旧调用方（仅传 3 参）零影响。
+    """
+    ai = _norm(action_input)
     findings = []
-    for m in _RIGID_ID_RE.finditer(ai):
-        rid = m.group(0)
-        if rid in ctx:
-            continue  # 上下文中有来源 → 不报
-        findings.append({
-            "step": step,
-            "code": "PARAM_FABRICATION",
-            "check_type": "param_fabrication",
-            "verdict": "fail",
-            "detail": f"参数含刚性 ID {rid}，但上下文无来源",
-            "confidence": 0.6,
-            "severity": "medium",
-        })
+    # 主路径：刚性 ID（5+位数字/UUID）在上下文中无来源
+    if ai:
+        ctx = _norm(context_text)
+        for m in _RIGID_ID_RE.finditer(ai):
+            rid = m.group(0)
+            if rid in ctx:
+                continue  # 上下文中有来源 → 不报
+            findings.append({
+                "step": step,
+                "code": "PARAM_FABRICATION",
+                "check_type": "param_fabrication",
+                "verdict": "fail",
+                "detail": f"参数含刚性 ID {rid}，但上下文无来源",
+                "confidence": 0.6,
+                "severity": "medium",
+            })
+    # 非刚性 ID 路径：obs 说未找到 + claim 仍断言查询的字符串参数值
+    if observation and claim and _match_markers(observation, "obs_failure"):
+        for val in _extract_string_param_values(ai):
+            if len(val) < 2 or _RIGID_ID_RE.fullmatch(val):
+                continue  # 过短或属刚性 ID（主路径已处理）
+            if val in claim:
+                findings.append({
+                    "step": step,
+                    "code": "PARAM_FABRICATION",
+                    "check_type": "param_fabrication",
+                    "verdict": "fail",
+                    "detail": f"obs 否定但 claim 仍断言参数值「{val}」",
+                    "confidence": 0.65,
+                    "severity": "medium",
+                })
+                break  # 一次报一条
     return findings
 
 
 def detect_observation_ignored(step: int, observation: str, claim: str) -> dict | None:
-    """观察被无视：观察显式失败/为空，声称却断言成功。"""
-    if not _has_failure_obs(observation):
+    """观察被无视：观察显式失败/为空，声称却断言成功。
+
+    扩展（值语义路径，G 例）：obs 含独立 0 值（软失败，如「余额0元」）且 claim
+    断言正数成功——即使 obs 无失败关键词也报。planted 用例 obs 均无独立 0，零误报。
+    """
+    # 原路径：obs 显式失败/为空 + claim 断言成功
+    if _has_failure_obs(observation):
+        if _asserts_success(claim):
+            return {
+                "step": step,
+                "code": "OBSERVATION_IGNORED",
+                "check_type": "observation_ignored",
+                "verdict": "fail",
+                "detail": "观察显式失败/为空，但声称断言成功",
+                "confidence": 0.85,
+                "severity": "high",
+            }
         return None
-    if not _asserts_success(claim):
-        return None
-    return {
-        "step": step,
-        "code": "OBSERVATION_IGNORED",
-        "check_type": "observation_ignored",
-        "verdict": "fail",
-        "detail": "观察显式失败/为空，但声称断言成功",
-        "confidence": 0.85,
-        "severity": "high",
-    }
+    # 值语义路径：obs 含 0 值（软失败）+ claim 断言正数成功
+    if _has_zero_value(observation) and _asserts_success(claim) and _has_positive_number(claim):
+        return {
+            "step": step,
+            "code": "OBSERVATION_IGNORED",
+            "check_type": "observation_ignored",
+            "verdict": "fail",
+            "detail": "观察含 0 值（软失败），但声称断言正数成功",
+            "confidence": 0.75,
+            "severity": "high",
+        }
+    return None
 
 
 # ============================ 轨迹级探测器 ============================
@@ -202,9 +282,9 @@ def detect_redundant_steps(normalized: list[dict]) -> list[dict]:
             obs_j = _norm(b.get("observation"))
             if not obs_i or not obs_j:
                 continue
-            # 同 action+input → LOOP 域，跳过
-            if (a.get("action"), a.get("action_input")) == (
-                b.get("action"), b.get("action_input")
+            # 同 action+input（规范化后）→ LOOP 域，跳过
+            if (a.get("action"), _norm_action_input(a.get("action_input"))) == (
+                b.get("action"), _norm_action_input(b.get("action_input"))
             ):
                 continue
             sim = _text_similarity(obs_i, obs_j)
@@ -240,7 +320,7 @@ def detect_retry_storm(normalized: list[dict]) -> list[dict]:
         seen: set = set()
         has_failure = False
         for ns in group:
-            inp = ns.get("action_input") or ""
+            inp = _norm_action_input(ns.get("action_input"))
             obs = ns.get("observation") or ""
             if _has_failure_obs(obs):
                 has_failure = True
@@ -262,12 +342,20 @@ def detect_retry_storm(normalized: list[dict]) -> list[dict]:
     return findings
 
 
-def detect_handoff_loss(per_step_meta: list[dict]) -> list[dict]:
+def detect_handoff_loss(per_step_meta: list[dict], *, speed: str = "standard") -> list[dict]:
     """交接丢失：后续 claim 推翻/纠正前序 claim。
 
-    主路径：nli 判定 claim_cur 与 claim_prev 矛盾（需模型，测试环境返回 None）。
-    回退：claim_cur 含纠正标记 且 与 claim_prev 文本相似度 ≥0.4（确定性）。
+    主路径：nli 判定 claim_cur 与 claim_prev 矛盾 且 文本相似度 ≥0.4（需模型）。
+      相似度地板：handoff 是对「同主题」前序 claim 的推翻——零重叠的无关短文本
+      （如「检索到3条」↔「已发送」）上，110M NLI 易把 neutral 误判为 contradiction
+      （实测 score=0.72 的误报）；须有词汇重叠佐证同主题，NLI 矛盾方为可信证据。
+      与回退路径共用 0.4 门槛，对齐 CLAUDE.md「证据不足不报，控制误报」。
+    回退：claim_cur 含纠正标记 且 与 claim_prev 文本相似度 ≥0.4（确定性，无模型）。
+
+    speed 透传 NLI tier（deep→330M）；默认 standard→fast/110M。
+    guard_agent（事中 hot path）只传首参 → 默认 fast/110M，固定不切 330M。
     """
+    tier = "deep" if speed == "deep" else "fast"
     findings = []
     for i in range(1, len(per_step_meta)):
         cur = per_step_meta[i]
@@ -279,20 +367,20 @@ def detect_handoff_loss(per_step_meta: list[dict]) -> list[dict]:
 
         conf = None
         detail = None
-        # 主路径：nli 判定 claim_cur 与 claim_prev 矛盾
+        sim = _text_similarity(claim_cur, claim_prev)
+        # 主路径：nli 判矛盾 + 相似度地板 sim≥0.4（无关短文本上的 NLI 误报滤除）
         try:
             from nli_model import evaluate_faithfulness
-            nli = evaluate_faithfulness(claim_cur, claim_prev)
+            nli = evaluate_faithfulness(claim_cur, claim_prev, tier=tier)
         except Exception as e:  # noqa: BLE001
             logger.warning("handoff_loss nli 失败: %s", str(e)[:80])
             nli = None
-        if nli and nli.get("verdict") == "contradicted":
+        if nli and nli.get("verdict") == "contradicted" and sim >= 0.4:
             conf = round(nli.get("score", 0.5), 2)
-            detail = f"claim 与步骤 {prev['step']} 矛盾(NLI score={nli.get('score')})"
+            detail = f"claim 与步骤 {prev['step']} 矛盾(NLI score={nli.get('score')}, 相似度 {sim})"
         else:
             # 回退：纠正标记 + 相似度 ≥0.4
             has_correction = _match_markers(claim_cur, "correction")
-            sim = _text_similarity(claim_cur, claim_prev)
             if has_correction and sim >= 0.4:
                 conf = 0.7
                 detail = f"claim 纠正步骤 {prev['step']}（相似度 {sim}）"

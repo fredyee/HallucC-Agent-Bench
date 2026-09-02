@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "halluc-detect"
-version = "0.2.0"
-description = "Agent trajectory hallucination detector — fast tier is pure-stdlib, 0 LLM/0 search. Bilingual (CN+EN) marker lexicon + Chinese multi-domain benchmark."
+version = "0.3.0"
+description = "Agent trajectory hallucination detector + 100-case benchmark (HallucC-Agent-Bench) + independent LLM-as-judge circularity probe. Fast tier pure-stdlib, 0 LLM/0 search."
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
@@ -60,17 +60,21 @@ server = [
 halluc-detect = "halluc_detect:main"
 
 [tool.setuptools]
-# 仅打包 10 个检测器模块——pipeline/config/llm/search/server 不入 wheel，
-# 保持 fast 档精简。开发仓库内 pip install -e . 仍经 repo-root-on-path 访问全栈。
+# 打包 13 个开源模块。llm 为精简独立 OpenAI 兼容客户端（无 config 依赖，
+# 经 [llm] extra 装 openai SDK）；agent_benchmark_judge 为独立循环质疑探针。
+# config/search/server 等服务端模块不入 wheel，保持 wheel 精简。
 py-modules = [
     "halluc_detect",
     "common_sense",
+    "claim_alignment",
     "failure_mode_codes",
     "agent_eval",
     "agent_pipeline",
     "agent_benchmark",
+    "agent_benchmark_judge",
     "failure_modes",
     "math_checker",
     "log_utils",
     "nli_model",
+    "llm",
 ]

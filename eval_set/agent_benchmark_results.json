@@ -1,0 +1,5201 @@
+{
+  "meta": {
+    "generated_at": "2026-09-01T21:36:04+08:00",
+    "total_cases": 100,
+    "contract_cases": 20,
+    "adversarial_cases": 80,
+    "standard_subset_cases": 20,
+    "coverage_gap": [
+      "SCOPE_DRIFT",
+      "PREMATURE_STOP"
+    ],
+    "failure_mode_codes": [
+      "CLAIM_MISMATCH",
+      "RETRY_STORM",
+      "LOOP",
+      "OBSERVATION_IGNORED",
+      "REDUNDANT_STEP",
+      "HALLUCINATED_TOOL",
+      "PARAM_FABRICATION",
+      "SCOPE_DRIFT",
+      "HANDOFF_LOSS",
+      "SCHEMA_VIOLATION",
+      "OVERCONFIDENT_ASSERTION",
+      "PREMATURE_STOP"
+    ]
+  },
+  "fast": {
+    "contract": {
+      "meta": {
+        "generated_at": "2026-09-01T21:34:26+08:00",
+        "speed": "fast",
+        "sample_count": 20,
+        "suite_label": "contract_20"
+      },
+      "speed": "fast",
+      "total": 20,
+      "case_metrics": {
+        "tp": 12,
+        "fn": 0,
+        "fp": 0,
+        "tn": 8,
+        "accuracy": 1.0,
+        "recall": 1.0,
+        "precision": 1.0,
+        "f1": 1.0,
+        "fp_rate": 0.0
+      },
+      "instance_metrics": {
+        "tp": 16,
+        "fn": 0,
+        "fp": 0,
+        "recall": 1.0,
+        "precision": 1.0
+      },
+      "per_code_detection": {
+        "CLAIM_MISMATCH": {
+          "expected": 4,
+          "detected": 4,
+          "rate": 1.0
+        },
+        "OBSERVATION_IGNORED": {
+          "expected": 2,
+          "detected": 2,
+          "rate": 1.0
+        },
+        "SCHEMA_VIOLATION": {
+          "expected": 1,
+          "detected": 1,
+          "rate": 1.0
+        },
+        "OVERCONFIDENT_ASSERTION": {
+          "expected": 1,
+          "detected": 1,
+          "rate": 1.0
+        },
+        "RETRY_STORM": {
+          "expected": 1,
+          "detected": 1,
+          "rate": 1.0
+        },
+        "LOOP": {
+          "expected": 1,
+          "detected": 1,
+          "rate": 1.0
+        },
+        "PARAM_FABRICATION": {
+          "expected": 2,
+          "detected": 2,
+          "rate": 1.0
+        },
+        "HALLUCINATED_TOOL": {
+          "expected": 2,
+          "detected": 2,
+          "rate": 1.0
+        },
+        "REDUNDANT_STEP": {
+          "expected": 1,
+          "detected": 1,
+          "rate": 1.0
+        },
+        "HANDOFF_LOSS": {
+          "expected": 1,
+          "detected": 1,
+          "rate": 1.0
+        }
+      },
+      "llm_calls": 0,
+      "search_calls": 0,
+      "coverage_gap": [
+        "SCOPE_DRIFT",
+        "PREMATURE_STOP"
+      ],
+      "acceptance": {
+        "recall_target": 0.8,
+        "fp_rate_target": 0.15,
+        "recall_pass": true,
+        "fp_rate_pass": true
+      },
+      "per_case": [
+        {
+          "id": "c1_weather",
+          "label": "clean",
+          "correct": true,
+          "expected": [],
+          "detected": [],
+          "inst_tp": 0,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "c2_order",
+          "label": "clean",
+          "correct": true,
+          "expected": [],
+          "detected": [],
+          "inst_tp": 0,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "c3_calc",
+          "label": "clean",
+          "correct": true,
+          "expected": [],
+          "detected": [],
+          "inst_tp": 0,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "c4_search",
+          "label": "clean",
+          "correct": true,
+          "expected": [],
+          "detected": [],
+          "inst_tp": 0,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "c5_multistep",
+          "label": "clean",
+          "correct": true,
+          "expected": [],
+          "detected": [],
+          "inst_tp": 0,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "c6_empty_result",
+          "label": "clean",
+          "correct": true,
+          "expected": [],
+          "detected": [],
+          "inst_tp": 0,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "c7_translate",
+          "label": "clean",
+          "correct": true,
+          "expected": [],
+          "detected": [],
+          "inst_tp": 0,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "c8_final_answer",
+          "label": "clean",
+          "correct": true,
+          "expected": [],
+          "detected": [],
+          "inst_tp": 0,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "h1_hallucinated_tool",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "HALLUCINATED_TOOL",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "HALLUCINATED_TOOL",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "h2_schema_violation",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "SCHEMA_VIOLATION",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "SCHEMA_VIOLATION",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "h3_claim_mismatch",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "h4_observation_ignored",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "h5_overconfident_assertion",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "OVERCONFIDENT_ASSERTION",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "OVERCONFIDENT_ASSERTION",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "h6_param_fabrication",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "PARAM_FABRICATION",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "PARAM_FABRICATION",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "h7_loop",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "LOOP",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "LOOP",
+              2
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "h8_retry_storm",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "RETRY_STORM",
+              3
+            ]
+          ],
+          "detected": [
+            [
+              "RETRY_STORM",
+              3
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "h9_redundant_step",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "REDUNDANT_STEP",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "REDUNDANT_STEP",
+              2
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "h10_handoff_loss",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "h11_multi_mode",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "HALLUCINATED_TOOL",
+              1
+            ],
+            [
+              "PARAM_FABRICATION",
+              1
+            ],
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "HALLUCINATED_TOOL",
+              1
+            ],
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ],
+            [
+              "PARAM_FABRICATION",
+              1
+            ]
+          ],
+          "inst_tp": 4,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "h12_math_error",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        }
+      ]
+    },
+    "adversarial": {
+      "meta": {
+        "generated_at": "2026-09-01T21:34:44+08:00",
+        "speed": "fast",
+        "sample_count": 80,
+        "suite_label": "adversarial_80"
+      },
+      "speed": "fast",
+      "total": 80,
+      "case_metrics": {
+        "tp": 74,
+        "fn": 5,
+        "fp": 0,
+        "tn": 1,
+        "accuracy": 0.9375,
+        "recall": 0.9367,
+        "precision": 1.0,
+        "f1": 0.9673,
+        "fp_rate": 0.0
+      },
+      "instance_metrics": {
+        "tp": 97,
+        "fn": 13,
+        "fp": 22,
+        "recall": 0.8818,
+        "precision": 0.8151
+      },
+      "per_code_detection": {
+        "CLAIM_MISMATCH": {
+          "expected": 66,
+          "detected": 60,
+          "rate": 0.9091
+        },
+        "RETRY_STORM": {
+          "expected": 3,
+          "detected": 3,
+          "rate": 1.0
+        },
+        "LOOP": {
+          "expected": 4,
+          "detected": 4,
+          "rate": 1.0
+        },
+        "OBSERVATION_IGNORED": {
+          "expected": 8,
+          "detected": 8,
+          "rate": 1.0
+        },
+        "PARAM_FABRICATION": {
+          "expected": 7,
+          "detected": 7,
+          "rate": 1.0
+        },
+        "REDUNDANT_STEP": {
+          "expected": 1,
+          "detected": 0,
+          "rate": 0.0
+        },
+        "SCOPE_DRIFT": {
+          "expected": 5,
+          "detected": 0,
+          "rate": 0.0
+        },
+        "HANDOFF_LOSS": {
+          "expected": 9,
+          "detected": 9,
+          "rate": 1.0
+        },
+        "OVERCONFIDENT_ASSERTION": {
+          "expected": 7,
+          "detected": 6,
+          "rate": 0.8571
+        }
+      },
+      "llm_calls": 0,
+      "search_calls": 0,
+      "coverage_gap": [
+        "SCOPE_DRIFT",
+        "PREMATURE_STOP"
+      ],
+      "acceptance": {
+        "recall_target": 0.8,
+        "fp_rate_target": 0.15,
+        "recall_pass": true,
+        "fp_rate_pass": true
+      },
+      "per_case": [
+        {
+          "id": "A_number_tweak",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "PARAM_FABRICATION",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 1
+        },
+        {
+          "id": "B_id_swap",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "C_semantic_fabrication",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "D_silent_handoff",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "E_scope_drift",
+          "label": "hallucinated",
+          "correct": false,
+          "expected": [
+            [
+              "SCOPE_DRIFT",
+              1
+            ]
+          ],
+          "detected": [],
+          "inst_tp": 0,
+          "inst_fn": 1,
+          "inst_fp": 0
+        },
+        {
+          "id": "F_fabricated_city",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "PARAM_FABRICATION",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "PARAM_FABRICATION",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "G_zero_value_ignored",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "H_common_sense",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "OVERCONFIDENT_ASSERTION",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 1,
+          "inst_fp": 0
+        },
+        {
+          "id": "I_unit_fabrication",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "J_loop_bypass",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "LOOP",
+              2
+            ],
+            [
+              "REDUNDANT_STEP",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "LOOP",
+              2
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 1,
+          "inst_fp": 0
+        },
+        {
+          "id": "A2_weather_temp",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "A3_order_days",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "A4_stock_price",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "A5_drug_dose",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "A6_logistics_weight",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "A7_balance",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "A8_price",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "A9_distance",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "B2_order_swap",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "B3_logistics_id",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "B4_ticket_id",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "B5_invoice_id",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "B6_medical_id",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "B7_txn_id",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "C2_medical_dose",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "C3_legal_term",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "C4_finance_rate",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "C5_news_casualty",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "C6_product_spec",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "C7_history_year",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "C8_science_temp",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "C9_policy_subsidy",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "D2_order_status",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ],
+            [
+              "CLAIM_MISMATCH",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 1,
+          "inst_fp": 0
+        },
+        {
+          "id": "D3_ticket_status",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ],
+            [
+              "CLAIM_MISMATCH",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 1,
+          "inst_fp": 0
+        },
+        {
+          "id": "D4_booking_status",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ],
+            [
+              "CLAIM_MISMATCH",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 1,
+          "inst_fp": 0
+        },
+        {
+          "id": "D5_transfer_status",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ],
+            [
+              "CLAIM_MISMATCH",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 1,
+          "inst_fp": 0
+        },
+        {
+          "id": "D6_medical_handoff",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ],
+            [
+              "CLAIM_MISMATCH",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 1,
+          "inst_fp": 0
+        },
+        {
+          "id": "D7_ecom_refund",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ],
+            [
+              "CLAIM_MISMATCH",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 1,
+          "inst_fp": 0
+        },
+        {
+          "id": "E2_legal_scope",
+          "label": "hallucinated",
+          "correct": false,
+          "expected": [
+            [
+              "SCOPE_DRIFT",
+              1
+            ]
+          ],
+          "detected": [],
+          "inst_tp": 0,
+          "inst_fn": 1,
+          "inst_fp": 0
+        },
+        {
+          "id": "E3_finance_scope",
+          "label": "hallucinated",
+          "correct": false,
+          "expected": [
+            [
+              "SCOPE_DRIFT",
+              1
+            ]
+          ],
+          "detected": [],
+          "inst_tp": 0,
+          "inst_fn": 1,
+          "inst_fp": 0
+        },
+        {
+          "id": "E4_medical_scope",
+          "label": "hallucinated",
+          "correct": false,
+          "expected": [
+            [
+              "SCOPE_DRIFT",
+              1
+            ]
+          ],
+          "detected": [],
+          "inst_tp": 0,
+          "inst_fn": 1,
+          "inst_fp": 0
+        },
+        {
+          "id": "E5_policy_scope",
+          "label": "hallucinated",
+          "correct": false,
+          "expected": [
+            [
+              "SCOPE_DRIFT",
+              1
+            ]
+          ],
+          "detected": [],
+          "inst_tp": 0,
+          "inst_fn": 1,
+          "inst_fp": 0
+        },
+        {
+          "id": "F2_booking_person",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "PARAM_FABRICATION",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "PARAM_FABRICATION",
+              1
+            ],
+            [
+              "SCHEMA_VIOLATION",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 1
+        },
+        {
+          "id": "F3_calendar_event",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "PARAM_FABRICATION",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "OVERCONFIDENT_ASSERTION",
+              1
+            ],
+            [
+              "PARAM_FABRICATION",
+              1
+            ],
+            [
+              "SCHEMA_VIOLATION",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 2
+        },
+        {
+          "id": "F4_bill_account",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "PARAM_FABRICATION",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "PARAM_FABRICATION",
+              1
+            ],
+            [
+              "SCHEMA_VIOLATION",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 1
+        },
+        {
+          "id": "F5_search_person",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "PARAM_FABRICATION",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "PARAM_FABRICATION",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "F6_crm_customer",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "PARAM_FABRICATION",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "PARAM_FABRICATION",
+              1
+            ],
+            [
+              "SCHEMA_VIOLATION",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 1
+        },
+        {
+          "id": "F7_weather_city2",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "PARAM_FABRICATION",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "PARAM_FABRICATION",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "G2_stock_zero",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "G3_inventory_zero",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "G4_sensor_zero",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "G5_points_zero",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "G6_account_zero",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "H2_feb30",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "OVERCONFIDENT_ASSERTION",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "OVERCONFIDENT_ASSERTION",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "H3_cure_rate_pct",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "OVERCONFIDENT_ASSERTION",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "OVERCONFIDENT_ASSERTION",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "H4_efficiency_pct",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "OVERCONFIDENT_ASSERTION",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "OVERCONFIDENT_ASSERTION",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "H5_land_pct",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "OVERCONFIDENT_ASSERTION",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "OVERCONFIDENT_ASSERTION",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "H6_jun31",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "OVERCONFIDENT_ASSERTION",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "OVERCONFIDENT_ASSERTION",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "H7_sugar_pct",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "OVERCONFIDENT_ASSERTION",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "OVERCONFIDENT_ASSERTION",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "I2_weight_unit",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "I3_growth_pct",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "I4_dose_unit",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "I5_power_unit",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "I6_price_unit",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "J2_flight_loop",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "LOOP",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "LOOP",
+              2
+            ],
+            [
+              "LOOP",
+              3
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 1
+        },
+        {
+          "id": "J3_order_retry",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "RETRY_STORM",
+              3
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              2
+            ],
+            [
+              "CLAIM_MISMATCH",
+              3
+            ],
+            [
+              "REDUNDANT_STEP",
+              2
+            ],
+            [
+              "RETRY_STORM",
+              3
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 4
+        },
+        {
+          "id": "J4_schedule_loop",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "LOOP",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "LOOP",
+              2
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "J5_payment_retry",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "RETRY_STORM",
+              3
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              2
+            ],
+            [
+              "REDUNDANT_STEP",
+              2
+            ],
+            [
+              "RETRY_STORM",
+              3
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 3
+        },
+        {
+          "id": "J6_crawl_loop",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "LOOP",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "LOOP",
+              2
+            ],
+            [
+              "LOOP",
+              3
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 1
+        },
+        {
+          "id": "J7_queue_retry",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "RETRY_STORM",
+              3
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              2
+            ],
+            [
+              "CLAIM_MISMATCH",
+              3
+            ],
+            [
+              "REDUNDANT_STEP",
+              2
+            ],
+            [
+              "REDUNDANT_STEP",
+              3
+            ],
+            [
+              "RETRY_STORM",
+              3
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 5
+        },
+        {
+          "id": "K1_order_to_invoice",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              2
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "K2_symptom_to_drug",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              2
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "K3_quote_to_contract",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              2
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "K4_weather_to_flight",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              2
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "L1_weather_transit",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              2
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "L2_order_calc",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              2
+            ],
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ],
+            [
+              "PARAM_FABRICATION",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 2
+        },
+        {
+          "id": "L3_medical_multi",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              2
+            ],
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ]
+          ],
+          "inst_tp": 3,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "M1_amount_poison",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "M2_weather_poison",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "N1_balance_probe",
+          "label": "clean",
+          "correct": true,
+          "expected": [],
+          "detected": [],
+          "inst_tp": 0,
+          "inst_fn": 0,
+          "inst_fp": 0
+        }
+      ]
+    },
+    "total": {
+      "meta": {
+        "generated_at": "2026-09-01T21:35:05+08:00",
+        "speed": "fast",
+        "sample_count": 100,
+        "suite_label": "total_100"
+      },
+      "speed": "fast",
+      "total": 100,
+      "case_metrics": {
+        "tp": 86,
+        "fn": 5,
+        "fp": 0,
+        "tn": 9,
+        "accuracy": 0.95,
+        "recall": 0.9451,
+        "precision": 1.0,
+        "f1": 0.9718,
+        "fp_rate": 0.0
+      },
+      "instance_metrics": {
+        "tp": 113,
+        "fn": 13,
+        "fp": 22,
+        "recall": 0.8968,
+        "precision": 0.837
+      },
+      "per_code_detection": {
+        "CLAIM_MISMATCH": {
+          "expected": 70,
+          "detected": 64,
+          "rate": 0.9143
+        },
+        "OBSERVATION_IGNORED": {
+          "expected": 10,
+          "detected": 10,
+          "rate": 1.0
+        },
+        "SCOPE_DRIFT": {
+          "expected": 5,
+          "detected": 0,
+          "rate": 0.0
+        },
+        "SCHEMA_VIOLATION": {
+          "expected": 1,
+          "detected": 1,
+          "rate": 1.0
+        },
+        "OVERCONFIDENT_ASSERTION": {
+          "expected": 8,
+          "detected": 7,
+          "rate": 0.875
+        },
+        "RETRY_STORM": {
+          "expected": 4,
+          "detected": 4,
+          "rate": 1.0
+        },
+        "LOOP": {
+          "expected": 5,
+          "detected": 5,
+          "rate": 1.0
+        },
+        "PARAM_FABRICATION": {
+          "expected": 9,
+          "detected": 9,
+          "rate": 1.0
+        },
+        "HALLUCINATED_TOOL": {
+          "expected": 2,
+          "detected": 2,
+          "rate": 1.0
+        },
+        "REDUNDANT_STEP": {
+          "expected": 2,
+          "detected": 1,
+          "rate": 0.5
+        },
+        "HANDOFF_LOSS": {
+          "expected": 10,
+          "detected": 10,
+          "rate": 1.0
+        }
+      },
+      "llm_calls": 0,
+      "search_calls": 0,
+      "coverage_gap": [
+        "SCOPE_DRIFT",
+        "PREMATURE_STOP"
+      ],
+      "acceptance": {
+        "recall_target": 0.8,
+        "fp_rate_target": 0.15,
+        "recall_pass": true,
+        "fp_rate_pass": true
+      },
+      "per_case": [
+        {
+          "id": "c1_weather",
+          "label": "clean",
+          "correct": true,
+          "expected": [],
+          "detected": [],
+          "inst_tp": 0,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "c2_order",
+          "label": "clean",
+          "correct": true,
+          "expected": [],
+          "detected": [],
+          "inst_tp": 0,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "c3_calc",
+          "label": "clean",
+          "correct": true,
+          "expected": [],
+          "detected": [],
+          "inst_tp": 0,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "c4_search",
+          "label": "clean",
+          "correct": true,
+          "expected": [],
+          "detected": [],
+          "inst_tp": 0,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "c5_multistep",
+          "label": "clean",
+          "correct": true,
+          "expected": [],
+          "detected": [],
+          "inst_tp": 0,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "c6_empty_result",
+          "label": "clean",
+          "correct": true,
+          "expected": [],
+          "detected": [],
+          "inst_tp": 0,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "c7_translate",
+          "label": "clean",
+          "correct": true,
+          "expected": [],
+          "detected": [],
+          "inst_tp": 0,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "c8_final_answer",
+          "label": "clean",
+          "correct": true,
+          "expected": [],
+          "detected": [],
+          "inst_tp": 0,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "h1_hallucinated_tool",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "HALLUCINATED_TOOL",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "HALLUCINATED_TOOL",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "h2_schema_violation",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "SCHEMA_VIOLATION",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "SCHEMA_VIOLATION",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "h3_claim_mismatch",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "h4_observation_ignored",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "h5_overconfident_assertion",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "OVERCONFIDENT_ASSERTION",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "OVERCONFIDENT_ASSERTION",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "h6_param_fabrication",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "PARAM_FABRICATION",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "PARAM_FABRICATION",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "h7_loop",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "LOOP",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "LOOP",
+              2
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "h8_retry_storm",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "RETRY_STORM",
+              3
+            ]
+          ],
+          "detected": [
+            [
+              "RETRY_STORM",
+              3
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "h9_redundant_step",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "REDUNDANT_STEP",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "REDUNDANT_STEP",
+              2
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "h10_handoff_loss",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "h11_multi_mode",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "HALLUCINATED_TOOL",
+              1
+            ],
+            [
+              "PARAM_FABRICATION",
+              1
+            ],
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "HALLUCINATED_TOOL",
+              1
+            ],
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ],
+            [
+              "PARAM_FABRICATION",
+              1
+            ]
+          ],
+          "inst_tp": 4,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "h12_math_error",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "A_number_tweak",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "PARAM_FABRICATION",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 1
+        },
+        {
+          "id": "B_id_swap",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "C_semantic_fabrication",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "D_silent_handoff",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "E_scope_drift",
+          "label": "hallucinated",
+          "correct": false,
+          "expected": [
+            [
+              "SCOPE_DRIFT",
+              1
+            ]
+          ],
+          "detected": [],
+          "inst_tp": 0,
+          "inst_fn": 1,
+          "inst_fp": 0
+        },
+        {
+          "id": "F_fabricated_city",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "PARAM_FABRICATION",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "PARAM_FABRICATION",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "G_zero_value_ignored",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "H_common_sense",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "OVERCONFIDENT_ASSERTION",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 1,
+          "inst_fp": 0
+        },
+        {
+          "id": "I_unit_fabrication",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "J_loop_bypass",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "LOOP",
+              2
+            ],
+            [
+              "REDUNDANT_STEP",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "LOOP",
+              2
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 1,
+          "inst_fp": 0
+        },
+        {
+          "id": "A2_weather_temp",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "A3_order_days",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "A4_stock_price",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "A5_drug_dose",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "A6_logistics_weight",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "A7_balance",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "A8_price",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "A9_distance",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "B2_order_swap",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "B3_logistics_id",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "B4_ticket_id",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "B5_invoice_id",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "B6_medical_id",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "B7_txn_id",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "C2_medical_dose",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "C3_legal_term",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "C4_finance_rate",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "C5_news_casualty",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "C6_product_spec",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "C7_history_year",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "C8_science_temp",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "C9_policy_subsidy",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "D2_order_status",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ],
+            [
+              "CLAIM_MISMATCH",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 1,
+          "inst_fp": 0
+        },
+        {
+          "id": "D3_ticket_status",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ],
+            [
+              "CLAIM_MISMATCH",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 1,
+          "inst_fp": 0
+        },
+        {
+          "id": "D4_booking_status",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ],
+            [
+              "CLAIM_MISMATCH",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 1,
+          "inst_fp": 0
+        },
+        {
+          "id": "D5_transfer_status",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ],
+            [
+              "CLAIM_MISMATCH",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 1,
+          "inst_fp": 0
+        },
+        {
+          "id": "D6_medical_handoff",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ],
+            [
+              "CLAIM_MISMATCH",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 1,
+          "inst_fp": 0
+        },
+        {
+          "id": "D7_ecom_refund",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ],
+            [
+              "CLAIM_MISMATCH",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 1,
+          "inst_fp": 0
+        },
+        {
+          "id": "E2_legal_scope",
+          "label": "hallucinated",
+          "correct": false,
+          "expected": [
+            [
+              "SCOPE_DRIFT",
+              1
+            ]
+          ],
+          "detected": [],
+          "inst_tp": 0,
+          "inst_fn": 1,
+          "inst_fp": 0
+        },
+        {
+          "id": "E3_finance_scope",
+          "label": "hallucinated",
+          "correct": false,
+          "expected": [
+            [
+              "SCOPE_DRIFT",
+              1
+            ]
+          ],
+          "detected": [],
+          "inst_tp": 0,
+          "inst_fn": 1,
+          "inst_fp": 0
+        },
+        {
+          "id": "E4_medical_scope",
+          "label": "hallucinated",
+          "correct": false,
+          "expected": [
+            [
+              "SCOPE_DRIFT",
+              1
+            ]
+          ],
+          "detected": [],
+          "inst_tp": 0,
+          "inst_fn": 1,
+          "inst_fp": 0
+        },
+        {
+          "id": "E5_policy_scope",
+          "label": "hallucinated",
+          "correct": false,
+          "expected": [
+            [
+              "SCOPE_DRIFT",
+              1
+            ]
+          ],
+          "detected": [],
+          "inst_tp": 0,
+          "inst_fn": 1,
+          "inst_fp": 0
+        },
+        {
+          "id": "F2_booking_person",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "PARAM_FABRICATION",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "PARAM_FABRICATION",
+              1
+            ],
+            [
+              "SCHEMA_VIOLATION",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 1
+        },
+        {
+          "id": "F3_calendar_event",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "PARAM_FABRICATION",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "OVERCONFIDENT_ASSERTION",
+              1
+            ],
+            [
+              "PARAM_FABRICATION",
+              1
+            ],
+            [
+              "SCHEMA_VIOLATION",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 2
+        },
+        {
+          "id": "F4_bill_account",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "PARAM_FABRICATION",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "PARAM_FABRICATION",
+              1
+            ],
+            [
+              "SCHEMA_VIOLATION",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 1
+        },
+        {
+          "id": "F5_search_person",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "PARAM_FABRICATION",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "PARAM_FABRICATION",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "F6_crm_customer",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "PARAM_FABRICATION",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "PARAM_FABRICATION",
+              1
+            ],
+            [
+              "SCHEMA_VIOLATION",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 1
+        },
+        {
+          "id": "F7_weather_city2",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "PARAM_FABRICATION",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "PARAM_FABRICATION",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "G2_stock_zero",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "G3_inventory_zero",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "G4_sensor_zero",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "G5_points_zero",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "G6_account_zero",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "H2_feb30",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "OVERCONFIDENT_ASSERTION",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "OVERCONFIDENT_ASSERTION",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "H3_cure_rate_pct",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "OVERCONFIDENT_ASSERTION",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "OVERCONFIDENT_ASSERTION",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "H4_efficiency_pct",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "OVERCONFIDENT_ASSERTION",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "OVERCONFIDENT_ASSERTION",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "H5_land_pct",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "OVERCONFIDENT_ASSERTION",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "OVERCONFIDENT_ASSERTION",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "H6_jun31",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "OVERCONFIDENT_ASSERTION",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "OVERCONFIDENT_ASSERTION",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "H7_sugar_pct",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "OVERCONFIDENT_ASSERTION",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "OVERCONFIDENT_ASSERTION",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "I2_weight_unit",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "I3_growth_pct",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "I4_dose_unit",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "I5_power_unit",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "I6_price_unit",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "J2_flight_loop",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "LOOP",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "LOOP",
+              2
+            ],
+            [
+              "LOOP",
+              3
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 1
+        },
+        {
+          "id": "J3_order_retry",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "RETRY_STORM",
+              3
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              2
+            ],
+            [
+              "CLAIM_MISMATCH",
+              3
+            ],
+            [
+              "REDUNDANT_STEP",
+              2
+            ],
+            [
+              "RETRY_STORM",
+              3
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 4
+        },
+        {
+          "id": "J4_schedule_loop",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "LOOP",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "LOOP",
+              2
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "J5_payment_retry",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "RETRY_STORM",
+              3
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              2
+            ],
+            [
+              "REDUNDANT_STEP",
+              2
+            ],
+            [
+              "RETRY_STORM",
+              3
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 3
+        },
+        {
+          "id": "J6_crawl_loop",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "LOOP",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "LOOP",
+              2
+            ],
+            [
+              "LOOP",
+              3
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 1
+        },
+        {
+          "id": "J7_queue_retry",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "RETRY_STORM",
+              3
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              2
+            ],
+            [
+              "CLAIM_MISMATCH",
+              3
+            ],
+            [
+              "REDUNDANT_STEP",
+              2
+            ],
+            [
+              "REDUNDANT_STEP",
+              3
+            ],
+            [
+              "RETRY_STORM",
+              3
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 5
+        },
+        {
+          "id": "K1_order_to_invoice",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              2
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "K2_symptom_to_drug",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              2
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "K3_quote_to_contract",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              2
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "K4_weather_to_flight",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              2
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "L1_weather_transit",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              2
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "L2_order_calc",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              2
+            ],
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ],
+            [
+              "PARAM_FABRICATION",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 2
+        },
+        {
+          "id": "L3_medical_multi",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              2
+            ],
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ]
+          ],
+          "inst_tp": 3,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "M1_amount_poison",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "M2_weather_poison",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "N1_balance_probe",
+          "label": "clean",
+          "correct": true,
+          "expected": [],
+          "detected": [],
+          "inst_tp": 0,
+          "inst_fn": 0,
+          "inst_fp": 0
+        }
+      ]
+    }
+  },
+  "standard": {
+    "subset_20": {
+      "meta": {
+        "generated_at": "2026-09-01T21:36:04+08:00",
+        "speed": "standard",
+        "sample_count": 20,
+        "suite_label": "standard_subset_20"
+      },
+      "speed": "standard",
+      "total": 20,
+      "case_metrics": {
+        "tp": 12,
+        "fn": 0,
+        "fp": 0,
+        "tn": 8,
+        "accuracy": 1.0,
+        "recall": 1.0,
+        "precision": 1.0,
+        "f1": 1.0,
+        "fp_rate": 0.0
+      },
+      "instance_metrics": {
+        "tp": 14,
+        "fn": 2,
+        "fp": 2,
+        "recall": 0.875,
+        "precision": 0.875
+      },
+      "per_code_detection": {
+        "CLAIM_MISMATCH": {
+          "expected": 7,
+          "detected": 7,
+          "rate": 1.0
+        },
+        "LOOP": {
+          "expected": 1,
+          "detected": 1,
+          "rate": 1.0
+        },
+        "OBSERVATION_IGNORED": {
+          "expected": 1,
+          "detected": 1,
+          "rate": 1.0
+        },
+        "PARAM_FABRICATION": {
+          "expected": 1,
+          "detected": 1,
+          "rate": 1.0
+        },
+        "HALLUCINATED_TOOL": {
+          "expected": 1,
+          "detected": 1,
+          "rate": 1.0
+        },
+        "REDUNDANT_STEP": {
+          "expected": 1,
+          "detected": 0,
+          "rate": 0.0
+        },
+        "SCOPE_DRIFT": {
+          "expected": 1,
+          "detected": 1,
+          "rate": 1.0
+        },
+        "HANDOFF_LOSS": {
+          "expected": 1,
+          "detected": 1,
+          "rate": 1.0
+        },
+        "SCHEMA_VIOLATION": {
+          "expected": 1,
+          "detected": 1,
+          "rate": 1.0
+        },
+        "OVERCONFIDENT_ASSERTION": {
+          "expected": 1,
+          "detected": 0,
+          "rate": 0.0
+        }
+      },
+      "llm_calls": 26,
+      "search_calls": 0,
+      "coverage_gap": [
+        "SCOPE_DRIFT",
+        "PREMATURE_STOP"
+      ],
+      "acceptance": {
+        "recall_target": 0.8,
+        "fp_rate_target": 0.15,
+        "recall_pass": true,
+        "fp_rate_pass": true
+      },
+      "per_case": [
+        {
+          "id": "c1_weather",
+          "label": "clean",
+          "correct": true,
+          "expected": [],
+          "detected": [],
+          "inst_tp": 0,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "c2_order",
+          "label": "clean",
+          "correct": true,
+          "expected": [],
+          "detected": [],
+          "inst_tp": 0,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "c3_calc",
+          "label": "clean",
+          "correct": true,
+          "expected": [],
+          "detected": [],
+          "inst_tp": 0,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "c4_search",
+          "label": "clean",
+          "correct": true,
+          "expected": [],
+          "detected": [],
+          "inst_tp": 0,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "c5_multistep",
+          "label": "clean",
+          "correct": true,
+          "expected": [],
+          "detected": [],
+          "inst_tp": 0,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "c6_empty_result",
+          "label": "clean",
+          "correct": true,
+          "expected": [],
+          "detected": [],
+          "inst_tp": 0,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "c7_translate",
+          "label": "clean",
+          "correct": true,
+          "expected": [],
+          "detected": [],
+          "inst_tp": 0,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "c8_final_answer",
+          "label": "clean",
+          "correct": true,
+          "expected": [],
+          "detected": [],
+          "inst_tp": 0,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "h1_hallucinated_tool",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "HALLUCINATED_TOOL",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "HALLUCINATED_TOOL",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "h2_schema_violation",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "SCHEMA_VIOLATION",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "SCHEMA_VIOLATION",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "A_number_tweak",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "PARAM_FABRICATION",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 1
+        },
+        {
+          "id": "B_id_swap",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "C_semantic_fabrication",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "D_silent_handoff",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "HANDOFF_LOSS",
+              2
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "E_scope_drift",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "SCOPE_DRIFT",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "SCOPE_DRIFT",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "F_fabricated_city",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "PARAM_FABRICATION",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "PARAM_FABRICATION",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "G_zero_value_ignored",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ],
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "OBSERVATION_IGNORED",
+              1
+            ]
+          ],
+          "inst_tp": 2,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "H_common_sense",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "OVERCONFIDENT_ASSERTION",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ],
+            [
+              "SCOPE_DRIFT",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 1,
+          "inst_fp": 1
+        },
+        {
+          "id": "I_unit_fabrication",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "detected": [
+            [
+              "CLAIM_MISMATCH",
+              1
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 0,
+          "inst_fp": 0
+        },
+        {
+          "id": "J_loop_bypass",
+          "label": "hallucinated",
+          "correct": true,
+          "expected": [
+            [
+              "LOOP",
+              2
+            ],
+            [
+              "REDUNDANT_STEP",
+              2
+            ]
+          ],
+          "detected": [
+            [
+              "LOOP",
+              2
+            ]
+          ],
+          "inst_tp": 1,
+          "inst_fn": 1,
+          "inst_fp": 0
+        }
+      ]
+    }
+  }
+}

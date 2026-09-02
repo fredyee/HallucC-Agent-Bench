@@ -38,6 +38,31 @@ def _text_similarity(a: str, b: str) -> float:
     return round(jaccard, 2)
 
 
+def _norm_action_input(action_input: str | None) -> str:
+    """规范化 action_input 用作 LOOP/去重键：strip + lowercase + 压缩空白 + JSON 规范化。
+
+    解决细微差异绕过 (action, input) 去重——对抗用例 J：
+    '{"query":"abc"}' vs '{"query":"abc "}' 纯文本规范化后仍不同（空格在 JSON
+    字符串值内）→ 解析 JSON、strip 字符串值、按键序紧凑序列化，两者归一为
+    '{"query":"北京"}' → LOOP 命中。非 JSON 文本回退到纯文本规范化。
+    failure_modes 的 REDUNDANT_STEP/RETRY_STORM 去重同步调用本函数（一致性）。
+    """
+    if not action_input:
+        return ""
+    s = action_input.strip().lower()
+    s = re.sub(r"\s+", " ", s)
+    try:
+        params = json.loads(s)
+        if isinstance(params, dict):
+            return json.dumps(
+                {k: (v.strip() if isinstance(v, str) else v) for k, v in params.items()},
+                sort_keys=True, separators=(",", ":"), ensure_ascii=False,
+            )
+    except (json.JSONDecodeError, ValueError):
+        pass
+    return s
+
+
 def _normalize_step(s: dict, idx: int) -> dict:
     """归一化两种 step schema 到统一内部表示。
 
@@ -209,7 +234,8 @@ def evaluate(trajectory: list[dict], tool_schemas: dict | None = None) -> AgentE
                                "source": "deterministic", "confidence": round(score, 2)})
 
         # 5. Loop Detection — 相同 action+input 组合重复
-        key = (action, action_input[:50])
+        # key 用 _norm_action_input 规范化：末尾空格等细微差异不再绕过去重（J 例）
+        key = (action, _norm_action_input(action_input))
         if key in seen and key[0]:
             loops += 1
             checks.append({"type": "loop", "verdict": "loop",

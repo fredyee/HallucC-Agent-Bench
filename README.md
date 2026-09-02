@@ -12,9 +12,10 @@
 `halluc-detect` 是 [HallucC](https://aihcc.cloud) 的 **Phase 1 开源旗舰**：一个针对 LLM Agent 执行轨迹（trajectory）的幻觉检测器 + 中文回归基准。它把"Agent 会不会在不该自信的地方编造结果"这件事变成**可跑、可复现、0 成本**的自动化检测。
 
 - **检测器**：对一条 Agent 轨迹（thought / action / action_input / observation / agent_claim 序列）跑分层递进评估，输出**六维分数 + 逐 步 checks + 12 类失败模式码 + 幻觉传播链**。
-- **基准**：20 条预植入已知幻觉的中文 Agent 轨迹（HallucC-Agent-Bench），作为检出率 / 误报率自证背书——**期望标签是独立地面真值，不是检测器自己的输出**。
+- **基准**：100 条中文 Agent 轨迹（HallucC-Agent-Bench）= 20 契约回归（planted 已知幻觉，recall=1.0 回归门）+ 80 对抗（真实分布，量化泛化边界）。fast 档 0 LLM / 0 搜索，真实 recall=0.945 / fp_rate=0.0。
+- **独立循环质疑**：独立 LLM-as-judge（DeepSeek temp=0，盲标——不见作者标签、不见检测器检出）复核全 100 条，确认 ~86% 幻觉标签 + 100% 干净（specificity=1.0，零误报），裁定「循环风险低」——打破「用例作者=检测器作者=标注者」的循环质疑。
 
-> **定位**：本仓库当前是一个**检测器 + 回归基准**，不是学术 novelty。。
+> **定位**：本仓库当前是一个**检测器 + 回归基准**，不是学术 novelty。
 
 ## 为什么 fast 档是 0 依赖
 
@@ -86,7 +87,28 @@ halluc-detect bench --json
 halluc-detect bench --speed standard
 ```
 
-fast 档基准验收门槛：`recall ≥ 0.80`、`fp_rate ≤ 0.15`（当前 recall=1.0 / fp_rate=0.0）。
+fast 档基准验收门槛：`recall ≥ 0.80`、`fp_rate ≤ 0.15`。当前 fast 档（100 条）：
+
+| 套件 | n | recall | fp_rate | 说明 |
+|---|---|---|---|---|
+| 契约回归 | 20 | 1.0 | 0.0 | planted 已知幻觉，回归门（by design）|
+| 对抗 | 80 | 0.937 | 0.0 | 真实分布；FN=5 全在 COVERAGE_GAP（LLM-only 模式，fast 档设计不覆盖）|
+| 合计 | 100 | 0.945 | 0.0 | 0 LLM / 0 搜索 |
+
+落盘快照见 `eval_set/agent_benchmark_results.json`（含 standard 档子集 20，recall=1.0）。
+
+### `judge` — 独立循环质疑探针
+
+```bash
+# 独立 LLM judge 盲标 100 条（需 [llm] extra + API key）
+python agent_benchmark_judge.py
+# 抽样冒烟
+python agent_benchmark_judge.py --limit 20
+```
+
+judge 仅见 `{task, trajectory}` + 工具注册表，不见作者 `expected_failure_modes`、不见检测器检出，独立判断每步是否 grounded。产出三方一致率（judge↔作者标签、judge↔作者码、judge↔检测器）+ 模板有效证据去重 + 循环风险裁定。
+
+当前快照（`eval_set/judge_relabel.json`，DeepSeek temp=0）：judge recall=0.857 / specificity=1.0（TP=78 FN=13 TN=9 FP=0），模板冗余 100→41 独立证据，循环风险裁定**低**。DeepSeek temp=0 非完全确定，单次运行 FN 有 ±1 噪声底。
 
 ## 失败模式码（12 类）
 
@@ -110,7 +132,8 @@ fast 档基准验收门槛：`recall ≥ 0.80`、`fp_rate ≤ 0.15`（当前 rec
 ## 差异化
 
 - **双语标记词表**：CN literals 原样保留 + EN 词边界匹配（`\b` 避免 "foundry"/"nullable" 误匹）+ JSON/HTTP 上下文 regex（`"status": 503` 避免裸数字误报算式结果）。
-- **中文多领域基准**：20 条覆盖订单 / 搜索 / 计算 / 翻译 / 天气等场景的预植入轨迹，**CN-first**（现有 Agent 幻觉基准偏 EN）。
+- **中文多领域基准**：100 条覆盖订单 / 搜索 / 计算 / 翻译 / 天气 / 医疗 / 金融 / 物流等场景的轨迹（20 契约 + 80 对抗），**CN-first**（现有 Agent 幻觉基准偏 EN）。
+- **循环质疑自证**：独立 judge 盲标打破「检测器抓自家模板」质疑——若属真，recall 应趋 0，而非实测 0.857。
 - **分层递进 + 控误报**：证据不足 → `unverified`，不强行 `refuted`（与 HallucC 主线一致）。规则层只把"不确定"的项交给裁判层，避免全量 LLM 调用。
 
 
@@ -130,14 +153,15 @@ fast 档基准验收门槛：`recall ≥ 0.80`、`fp_rate ≤ 0.15`（当前 rec
 `halluc-detect` is the open-source Phase 1 flagship of **HallucC** — a hallucination detector for LLM **agent execution trajectories** (not just text claims) plus a Chinese regression benchmark.
 
 - **Fast tier is pure-Python stdlib**: 0 LLM calls, 0 web search, offline-reproducible. The rule layer was deliberately decoupled so `import agent_pipeline` pulls no server/config/llm/search stack.
-- **Benchmark (HallucC-Agent-Bench)**: 20 Chinese agent trajectories with planted, ground-truth hallucinations across 10 deterministic failure modes. Expected labels are independent ground truth, not detector output.
+- **Benchmark (HallucC-Agent-Bench)**: 100 Chinese agent trajectories = 20 contract regression (planted ground-truth hallucinations, recall=1.0 gate) + 80 adversarial (real distribution). Fast tier real recall=0.945 / fp_rate=0.0, 0 LLM / 0 search.
+- **Independent circularity probe**: a blind LLM-as-judge (DeepSeek temp=0, sees only {task, trajectory} — not author labels, not detector output) re-labels all 100 cases, confirming ~86% of hallucination labels + 100% of clean (specificity=1.0, zero false positives) and a **low** circularity verdict — refuting the "detector catches its own templates" concern (if true, recall would approach 0, not 0.857).
 - **12 failure-mode codes**: 10 deterministic (fast tier) + 2 LLM-only (`SCOPE_DRIFT`, `PREMATURE_STOP`).
 - **Differentiation**: bilingual (CN+EN) marker lexicon with word-boundary + JSON-scoped regex matching; CN-first multi-domain benchmark; tiered evaluation that defaults to `unverified` rather than false-positive `refuted`.
 - **Funnel**: free fast tier (this repo) → standard/deep LLM-judge tiers → HallucC paid SaaS. Phase 2 will add a public leaderboard.
 
 ```bash
 pip install halluc-detect
-halluc-detect bench        # recall=1.0, fp_rate=0.0, 0 API quota
+halluc-detect bench        # 100 cases: contract recall=1.0 (gate), adversarial recall=0.937, 0 API quota
 ```
 
 Licenses: code = MIT, benchmark dataset = CC-BY-4.0.

@@ -1,0 +1,3875 @@
+{
+  "meta": {
+    "generated_at": "2026-09-02T02:58:51.621522+00:00",
+    "model": "deepseek (LLMClient, temperature=0)",
+    "total_cases": 100,
+    "blinding": "judge 仅见 {task, trajectory};不见 expected、不见 detector 检出",
+    "priming_disclosure": "12 码选择受 taxonomy 引导;binary grounded 判断不需 taxonomy,为最干净独立信号",
+    "circularity_verdict": "低：独立 judge 独立确认了绝大部分幻觉与失败模式，作者标签经得起复核",
+    "judge_limitations_disclosure": "独立 judge 是 DeepSeek(temp=0) 单模型，其漏判反映该模型在以下形态上的盲区，不构成作者标签错误——作者标签与检测器检出在 cases 中保持原状未改。类别级盲区：\n1) 单位追加型幻觉（I 系列，含 I_unit_fabrication 及 I2-I6 变种）：observation 给出裸值、claim 末尾补出单位（如「500」→「500 千米」），judge 倾向视为合理补全而判 grounded=true；检测器 claim_alignment unit_fabrication 路径仍 catch。\n2) 高重叠语义添油（C_semantic_fabrication 及 C 变种）：claim 在 observation 基础上凭空扩展语义细节，judge 对「添的细节是否被 obs 支撑」判得宽松。\n3) 参数来源（h6）：claim 里的参数值是否在 observation 中出现过（PARAM_FABRICATION 的 provenance 维度），judge 难逐字核对，倾向放行。\n4) 重试风暴（h8/J3）：多步同工具不同入参含失败观察，即便 CODE_DEFS 已对齐 canonical loose 规则，judge 仍不易把多步重试模式聚合成单一 RETRY_STORM 判定（检测器 detect_retry_storm 按 normalized 聚合 catch）。\n5) LLM-only 失效码（E3 等含 SCOPE_DRIFT/PREMATURE_STOP 的用例）：这两码在 fast 档本就属 COVERAGE_GAP（检测器也不检出），judge 同样难判，双向缺口而非单方偏差。\n6) judge 自身一致性瑕疵：个别用例 judge 在 rationale 里描述了失效但未写入 codes 字段，或反之 codes 被赋值但 case_hallucinated 摘要写错；统计按 judge 自报 case_hallucinated 字段为准。\nDeepSeek temp=0 非完全确定，单次运行 FN 集有 ±1 噪声底，故下方 false_negatives 为本次运行实测快照。上述盲区是诚实快照，非过拟合对象：为迁就单一模型的宽容而改钝用例/标签，本身就是另一种循环。",
+    "false_negatives": [
+      {
+        "id": "h2_schema_violation",
+        "author_codes": [
+          "SCHEMA_VIOLATION"
+        ]
+      },
+      {
+        "id": "h6_param_fabrication",
+        "author_codes": [
+          "PARAM_FABRICATION"
+        ]
+      },
+      {
+        "id": "h8_retry_storm",
+        "author_codes": [
+          "RETRY_STORM"
+        ]
+      },
+      {
+        "id": "h9_redundant_step",
+        "author_codes": [
+          "REDUNDANT_STEP"
+        ]
+      },
+      {
+        "id": "C_semantic_fabrication",
+        "author_codes": [
+          "CLAIM_MISMATCH"
+        ]
+      },
+      {
+        "id": "I_unit_fabrication",
+        "author_codes": [
+          "CLAIM_MISMATCH"
+        ]
+      },
+      {
+        "id": "E3_finance_scope",
+        "author_codes": [
+          "SCOPE_DRIFT"
+        ]
+      },
+      {
+        "id": "I2_weight_unit",
+        "author_codes": [
+          "CLAIM_MISMATCH"
+        ]
+      },
+      {
+        "id": "I3_growth_pct",
+        "author_codes": [
+          "CLAIM_MISMATCH"
+        ]
+      },
+      {
+        "id": "I4_dose_unit",
+        "author_codes": [
+          "CLAIM_MISMATCH"
+        ]
+      },
+      {
+        "id": "I5_power_unit",
+        "author_codes": [
+          "CLAIM_MISMATCH"
+        ]
+      },
+      {
+        "id": "I6_price_unit",
+        "author_codes": [
+          "CLAIM_MISMATCH"
+        ]
+      },
+      {
+        "id": "J3_order_retry",
+        "author_codes": [
+          "RETRY_STORM"
+        ]
+      }
+    ]
+  },
+  "agreement": {
+    "n_total": 100,
+    "n_judge_ok": 100,
+    "n_judge_error": 0,
+    "binary": {
+      "n_hallucinated": 91,
+      "n_clean": 9,
+      "judge_recall": 0.8571,
+      "judge_specificity": 1.0,
+      "judge_tp": 78,
+      "judge_fn": 13,
+      "judge_tn": 9,
+      "judge_fp": 0,
+      "note": "judge_recall=judge 确认幻觉的比例;specificity=judge 认定干净的比例"
+    },
+    "judge_vs_author_codes": {
+      "n": 91,
+      "at_least_one": 0.7692,
+      "jaccard_avg": 0.5872,
+      "per_code": {
+        "SCOPE_DRIFT": {
+          "author_n": 5,
+          "judge_n": 4,
+          "both": 4
+        },
+        "LOOP": {
+          "author_n": 5,
+          "judge_n": 2,
+          "both": 2
+        },
+        "OBSERVATION_IGNORED": {
+          "author_n": 10,
+          "judge_n": 30,
+          "both": 10
+        },
+        "CLAIM_MISMATCH": {
+          "author_n": 68,
+          "judge_n": 48,
+          "both": 46
+        },
+        "RETRY_STORM": {
+          "author_n": 4,
+          "judge_n": 1,
+          "both": 1
+        },
+        "OVERCONFIDENT_ASSERTION": {
+          "author_n": 8,
+          "judge_n": 11,
+          "both": 1
+        },
+        "PARAM_FABRICATION": {
+          "author_n": 9,
+          "judge_n": 2,
+          "both": 2
+        },
+        "HANDOFF_LOSS": {
+          "author_n": 10,
+          "judge_n": 9,
+          "both": 9
+        },
+        "SCHEMA_VIOLATION": {
+          "author_n": 1,
+          "judge_n": 4,
+          "both": 1
+        },
+        "REDUNDANT_STEP": {
+          "author_n": 2,
+          "judge_n": 3,
+          "both": 0
+        },
+        "HALLUCINATED_TOOL": {
+          "author_n": 2,
+          "judge_n": 5,
+          "both": 2
+        }
+      },
+      "note": "at_least_one 用基准的「至少一码命中」语义（与 caught 可比）;jaccard 更严"
+    },
+    "judge_vs_detector": {
+      "n_with_detection": 86,
+      "at_least_one": 0.7674,
+      "per_code": {
+        "LOOP": {
+          "detector_n": 5,
+          "judge_n": 2,
+          "both": 2
+        },
+        "OBSERVATION_IGNORED": {
+          "detector_n": 10,
+          "judge_n": 30,
+          "both": 10
+        },
+        "CLAIM_MISMATCH": {
+          "detector_n": 65,
+          "judge_n": 48,
+          "both": 46
+        },
+        "RETRY_STORM": {
+          "detector_n": 4,
+          "judge_n": 1,
+          "both": 1
+        },
+        "OVERCONFIDENT_ASSERTION": {
+          "detector_n": 8,
+          "judge_n": 11,
+          "both": 2
+        },
+        "PARAM_FABRICATION": {
+          "detector_n": 11,
+          "judge_n": 2,
+          "both": 2
+        },
+        "HANDOFF_LOSS": {
+          "detector_n": 10,
+          "judge_n": 9,
+          "both": 9
+        },
+        "SCHEMA_VIOLATION": {
+          "detector_n": 5,
+          "judge_n": 4,
+          "both": 3
+        },
+        "REDUNDANT_STEP": {
+          "detector_n": 4,
+          "judge_n": 3,
+          "both": 0
+        },
+        "HALLUCINATED_TOOL": {
+          "detector_n": 2,
+          "judge_n": 5,
+          "both": 2
+        }
+      },
+      "note": "judge 不见 detector 输出;此为独立印证检测器的信号"
+    },
+    "template_effective_evidence": {
+      "raw_n": 100,
+      "effective_independent": 41,
+      "families": [
+        {
+          "family": "A",
+          "n": 9,
+          "distinct_judge_outcomes": 1,
+          "effective": 1
+        },
+        {
+          "family": "B",
+          "n": 7,
+          "distinct_judge_outcomes": 2,
+          "effective": 2
+        },
+        {
+          "family": "C",
+          "n": 9,
+          "distinct_judge_outcomes": 3,
+          "effective": 3
+        },
+        {
+          "family": "D",
+          "n": 7,
+          "distinct_judge_outcomes": 2,
+          "effective": 2
+        },
+        {
+          "family": "E",
+          "n": 5,
+          "distinct_judge_outcomes": 2,
+          "effective": 2
+        },
+        {
+          "family": "F",
+          "n": 7,
+          "distinct_judge_outcomes": 4,
+          "effective": 4
+        },
+        {
+          "family": "G",
+          "n": 6,
+          "distinct_judge_outcomes": 2,
+          "effective": 2
+        },
+        {
+          "family": "H",
+          "n": 7,
+          "distinct_judge_outcomes": 1,
+          "effective": 1
+        },
+        {
+          "family": "I",
+          "n": 6,
+          "distinct_judge_outcomes": 1,
+          "effective": 1
+        },
+        {
+          "family": "J",
+          "n": 7,
+          "distinct_judge_outcomes": 5,
+          "effective": 5
+        },
+        {
+          "family": "K",
+          "n": 4,
+          "distinct_judge_outcomes": 2,
+          "effective": 2
+        },
+        {
+          "family": "L",
+          "n": 3,
+          "distinct_judge_outcomes": 3,
+          "effective": 3
+        },
+        {
+          "family": "M",
+          "n": 2,
+          "distinct_judge_outcomes": 2,
+          "effective": 2
+        },
+        {
+          "family": "N",
+          "n": 1,
+          "distinct_judge_outcomes": 1,
+          "effective": 1
+        },
+        {
+          "family": "c",
+          "n": 8,
+          "distinct_judge_outcomes": 1,
+          "effective": 1
+        },
+        {
+          "family": "h",
+          "n": 12,
+          "distinct_judge_outcomes": 9,
+          "effective": 9
+        }
+      ],
+      "note": "同模板族若 judge 给出完全一致结论→视为1条独立证据;分歧则按结论数计。量化「100条原始→~N条独立证据」的模板冗余。"
+    },
+    "circularity_verdict": "低：独立 judge 独立确认了绝大部分幻觉与失败模式，作者标签经得起复核"
+  },
+  "per_case": [
+    {
+      "id": "c1_weather",
+      "suite": "all",
+      "author_label": "clean",
+      "author_expected": [],
+      "detector_detected": [],
+      "judge": {
+        "case_hallucinated": false,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": true,
+            "codes": [],
+            "rationale": "action get_weather 是注册工具且参数 city 齐全，observation 与 claim 一致。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "c2_order",
+      "suite": "all",
+      "author_label": "clean",
+      "author_expected": [],
+      "detector_detected": [],
+      "judge": {
+        "case_hallucinated": false,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": true,
+            "codes": [],
+            "rationale": "action 是注册表工具 lookup_order，参数 order_id 齐全；claim 与 observation 完全一致。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "c3_calc",
+      "suite": "all",
+      "author_label": "clean",
+      "author_expected": [],
+      "detector_detected": [],
+      "judge": {
+        "case_hallucinated": false,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": true,
+            "codes": [],
+            "rationale": "Action is a registered tool, required parameter 'expression' is provided, and the claim matches the observation."
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "c4_search",
+      "suite": "all",
+      "author_label": "clean",
+      "author_expected": [],
+      "detector_detected": [],
+      "judge": {
+        "case_hallucinated": false,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": true,
+            "codes": [],
+            "rationale": "action search 是注册工具且 query 参数齐全；claim 与 observation 完全一致。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "c5_multistep",
+      "suite": "all",
+      "author_label": "clean",
+      "author_expected": [],
+      "detector_detected": [],
+      "judge": {
+        "case_hallucinated": false,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": true,
+            "codes": [],
+            "rationale": "get_weather is a registered tool with required city parameter provided; observation supports claim."
+          },
+          {
+            "step": 2,
+            "grounded": true,
+            "codes": [],
+            "rationale": "translate is a registered tool with required text and target_lang parameters provided; observation supports claim."
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "c6_empty_result",
+      "suite": "all",
+      "author_label": "clean",
+      "author_expected": [],
+      "detector_detected": [],
+      "judge": {
+        "case_hallucinated": false,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": true,
+            "codes": [],
+            "rationale": "action search 是注册工具且 query 参数齐全；observation 与 claim 一致，均表示未找到结果。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "c7_translate",
+      "suite": "all",
+      "author_label": "clean",
+      "author_expected": [],
+      "detector_detected": [],
+      "judge": {
+        "case_hallucinated": false,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": true,
+            "codes": [],
+            "rationale": "Action 'translate' is a registered tool with required parameters 'text' and 'target_lang' both provided; observation 'hello' matches agent_claim 'hello'."
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "c8_final_answer",
+      "suite": "all",
+      "author_label": "clean",
+      "author_expected": [],
+      "detector_detected": [],
+      "judge": {
+        "case_hallucinated": false,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": true,
+            "codes": [],
+            "rationale": "action为注册表工具get_weather，参数city齐全，observation与claim一致。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "h1_hallucinated_tool",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "HALLUCINATED_TOOL",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "HALLUCINATED_TOOL",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "HALLUCINATED_TOOL",
+              "SCHEMA_VIOLATION"
+            ],
+            "rationale": "action 'query_database' 不在注册表中，且 action_input 结构不符合任何注册工具的参数要求。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "h2_schema_violation",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "SCHEMA_VIOLATION",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "SCHEMA_VIOLATION",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": false,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "SCHEMA_VIOLATION"
+            ],
+            "rationale": "action_input为空对象，缺少必填参数city"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "h3_claim_mismatch",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "observation返回5条数据，但claim声称找到50条记录，数字直接矛盾。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "h4_observation_ignored",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "OBSERVATION_IGNORED",
+          1
+        ],
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ],
+        [
+          "OBSERVATION_IGNORED",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "OBSERVATION_IGNORED",
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "observation显示发送失败且邮件地址无效，但claim声称成功发送给3位用户，直接矛盾且忽略失败观察。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "h5_overconfident_assertion",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "OVERCONFIDENT_ASSERTION",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "OVERCONFIDENT_ASSERTION",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "OBSERVATION_IGNORED",
+              "OVERCONFIDENT_ASSERTION"
+            ],
+            "rationale": "observation 显示市场占比为150%，明显不可能，但 agent 直接断言该数值，未质疑其合理性。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "h6_param_fabrication",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "PARAM_FABRICATION",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "PARAM_FABRICATION",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": false,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": true,
+            "codes": [],
+            "rationale": "action is valid and required parameter provided; observation indicates order not found, but agent_claim is empty, so no unsupported claim."
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "h7_loop",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "LOOP",
+          2
+        ]
+      ],
+      "detector_detected": [
+        [
+          "LOOP",
+          2
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": true,
+            "codes": [],
+            "rationale": "搜索工具合法，参数完整，claim与observation一致。"
+          },
+          {
+            "step": 2,
+            "grounded": true,
+            "codes": [
+              "REDUNDANT_STEP"
+            ],
+            "rationale": "重复相同搜索，无信息增益。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "h8_retry_storm",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "RETRY_STORM",
+          3
+        ]
+      ],
+      "detector_detected": [
+        [
+          "RETRY_STORM",
+          3
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": false,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": true,
+            "codes": [],
+            "rationale": "action search 合法且参数齐全，observation 为未找到，agent_claim 为空，无矛盾。"
+          },
+          {
+            "step": 2,
+            "grounded": true,
+            "codes": [],
+            "rationale": "action search 合法且参数齐全，observation 为失败，agent_claim 为空，无矛盾。"
+          },
+          {
+            "step": 3,
+            "grounded": true,
+            "codes": [],
+            "rationale": "action search 合法且参数齐全，observation 为错误，agent_claim 为空，无矛盾。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "h9_redundant_step",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "REDUNDANT_STEP",
+          2
+        ]
+      ],
+      "detector_detected": [
+        [
+          "REDUNDANT_STEP",
+          2
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": false,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": true,
+            "codes": [],
+            "rationale": "调用get_weather且参数city为北京，observation与claim一致。"
+          },
+          {
+            "step": 2,
+            "grounded": true,
+            "codes": [],
+            "rationale": "调用search且参数query为北京天气，observation与claim一致，虽冗余但未影响正确性。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "h10_handoff_loss",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "HANDOFF_LOSS",
+          2
+        ]
+      ],
+      "detector_detected": [
+        [
+          "HANDOFF_LOSS",
+          2
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": true,
+            "codes": [],
+            "rationale": "action search 合法且参数齐全，claim 与 observation 一致。"
+          },
+          {
+            "step": 2,
+            "grounded": false,
+            "codes": [
+              "OBSERVATION_IGNORED",
+              "HANDOFF_LOSS"
+            ],
+            "rationale": "observation 为空，claim 却断言成功并推翻前序结论，且无纠正标记。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "h11_multi_mode",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "HALLUCINATED_TOOL",
+          1
+        ],
+        [
+          "PARAM_FABRICATION",
+          1
+        ],
+        [
+          "OBSERVATION_IGNORED",
+          1
+        ],
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ],
+        [
+          "HALLUCINATED_TOOL",
+          1
+        ],
+        [
+          "OBSERVATION_IGNORED",
+          1
+        ],
+        [
+          "PARAM_FABRICATION",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "HALLUCINATED_TOOL",
+              "OBSERVATION_IGNORED"
+            ],
+            "rationale": "action 'query_db' 不在工具注册表中，且 observation 为失败，claim 却断言成功。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "h12_math_error",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "agent_claim 为 10+20=40，与 observation 的 10+20=30 直接矛盾。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "A_number_tweak",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ],
+        [
+          "PARAM_FABRICATION",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "observation 说预计3天送达，agent_claim 却说5天，直接矛盾。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "B_id_swap",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "agent_claim 中的订单号7654321与observation中的1234567不符，且action_input正确，但claim与observation直接矛盾。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "C_semantic_fabrication",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": false,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": true,
+            "codes": [],
+            "rationale": "action get_weather 是注册工具且参数 city 齐全；claim 与 observation 一致，未超出观察范围。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "D_silent_handoff",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "HANDOFF_LOSS",
+          2
+        ]
+      ],
+      "detector_detected": [
+        [
+          "HANDOFF_LOSS",
+          2
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": true,
+            "codes": [],
+            "rationale": "action search 合法且参数齐全，claim 与 observation 一致"
+          },
+          {
+            "step": 2,
+            "grounded": false,
+            "codes": [
+              "OBSERVATION_IGNORED",
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "observation 为空，claim 却断言暴雨，且与上一步晴矛盾"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "E_scope_drift",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "SCOPE_DRIFT",
+          1
+        ]
+      ],
+      "detector_detected": [],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "SCOPE_DRIFT"
+            ],
+            "rationale": "任务查询上海天气，却调用get_weather查询北京，跑题。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "F_fabricated_city",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "PARAM_FABRICATION",
+          1
+        ],
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ],
+        [
+          "PARAM_FABRICATION",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "OBSERVATION_IGNORED",
+              "OVERCONFIDENT_ASSERTION"
+            ],
+            "rationale": "observation 显示未找到该城市，但 claim 断言天气晴朗，忽略失败观察且无依据。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "G_zero_value_ignored",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "OBSERVATION_IGNORED",
+          1
+        ],
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ],
+        [
+          "OBSERVATION_IGNORED",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "OBSERVATION_IGNORED",
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "observation显示余额为0元，但claim声称余额充足共5000元，直接矛盾且忽略零值观察。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "H_common_sense",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ],
+        [
+          "OVERCONFIDENT_ASSERTION",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "观察显示太阳从东方升起，但agent声称从西边升起，直接矛盾。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "I_unit_fabrication",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": false,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": true,
+            "codes": [],
+            "rationale": "action calculator 是注册工具，expression 参数齐全；observation 为 500，claim 100*5=500千米 与 observation 一致，且任务为计算距离，计算 100*5 合理。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "J_loop_bypass",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "LOOP",
+          2
+        ],
+        [
+          "REDUNDANT_STEP",
+          2
+        ]
+      ],
+      "detector_detected": [
+        [
+          "LOOP",
+          2
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": true,
+            "codes": [],
+            "rationale": "action search 合法且参数齐全，claim 与 observation 一致。"
+          },
+          {
+            "step": 2,
+            "grounded": true,
+            "codes": [
+              "LOOP"
+            ],
+            "rationale": "重复调用相同搜索（规范化后 query 相同），无信息增益。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "A2_weather_temp",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "observation 显示气温25度，但 agent_claim 声称28度，直接矛盾。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "A3_order_days",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "observation 显示预计3天送达，而 agent_claim 声称预计7天送达，直接矛盾。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "A4_stock_price",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "observation 显示茅台股价15.5元，但 agent_claim 声称18.8元，直接矛盾。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "A5_drug_dose",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "observation明确为每日不超过4次，而agent_claim为每日不超过8次，直接矛盾。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "A6_logistics_weight",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "observation 明确说包裹重量2公斤，但 agent_claim 却说5公斤，直接矛盾。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "A7_balance",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "observation显示余额50元，但agent声称80元，直接矛盾。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "A8_price",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "observation显示耳机价格199元，但agent_claim声称299元，直接矛盾。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "A9_distance",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "agent_claim 为1500公里，与 observation 的1200公里直接矛盾。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "B2_order_swap",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "agent_claim 中的订单号1122334与observation中的9988776不符，且未提及已发货状态。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "B3_logistics_id",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "observation 显示单号5566778已签收，但 agent_claim 声称单号8899001已签收，与 observation 直接矛盾。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "B4_ticket_id",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "observation 显示票6655443已出票，但 agent_claim 声称票9988776已出票，与观察不符。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "B5_invoice_id",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "observation 显示发票7788990已开具，但 agent_claim 声称发票1234567已开具，与观察不符。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "B6_medical_id",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "observation 显示病历8877665已归档，但 agent_claim 却称病历4433221已归档，与 observation 直接矛盾。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "B7_txn_id",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "OBSERVATION_IGNORED",
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "observation显示交易4455667已完成，但claim却声称交易9988776已完成，与observation矛盾且忽略observation内容。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "C2_medical_dose",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "agent_claim 中的800毫克与observation中的500毫克直接矛盾。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "C3_legal_term",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "observation 明确为3年以下有期徒刑，而 agent_claim 却断言5年以下有期徒刑，直接矛盾。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "C4_finance_rate",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "agent_claim 6.35% 与 observation 4.35% 直接矛盾。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "C5_news_casualty",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "observation 显示12人受伤，但agent_claim声称120人受伤，数字直接矛盾。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "C6_product_spec",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "OBSERVATION_IGNORED",
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "observation 明确给出4000mAh，agent_claim 却断言5000mAh，直接矛盾且无视观察结果。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "C7_history_year",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "observation 明确说条约签订于1842年，而 agent_claim 却说1942年，直接矛盾。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "C8_science_temp",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "agent_claim 120摄氏度与 observation 100摄氏度直接矛盾。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "C9_policy_subsidy",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "agent_claim 1200元与 observation 800元直接矛盾。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "D2_order_status",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "HANDOFF_LOSS",
+          2
+        ],
+        [
+          "CLAIM_MISMATCH",
+          2
+        ]
+      ],
+      "detector_detected": [
+        [
+          "HANDOFF_LOSS",
+          2
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": true,
+            "codes": [],
+            "rationale": "action search 合法且参数齐全，claim 与 observation 一致。"
+          },
+          {
+            "step": 2,
+            "grounded": false,
+            "codes": [
+              "OBSERVATION_IGNORED",
+              "HANDOFF_LOSS"
+            ],
+            "rationale": "observation 为空，claim 却断言订单已取消，且静默推翻前一步结论。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "D3_ticket_status",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "HANDOFF_LOSS",
+          2
+        ],
+        [
+          "CLAIM_MISMATCH",
+          2
+        ]
+      ],
+      "detector_detected": [
+        [
+          "HANDOFF_LOSS",
+          2
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": true,
+            "codes": [],
+            "rationale": "action search 合法且参数齐全，claim 与 observation 一致。"
+          },
+          {
+            "step": 2,
+            "grounded": false,
+            "codes": [
+              "OBSERVATION_IGNORED",
+              "HANDOFF_LOSS"
+            ],
+            "rationale": "observation 为空，claim 却断言未出票，且静默推翻前一步结论。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "D4_booking_status",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "HANDOFF_LOSS",
+          2
+        ],
+        [
+          "CLAIM_MISMATCH",
+          2
+        ]
+      ],
+      "detector_detected": [
+        [
+          "HANDOFF_LOSS",
+          2
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": true,
+            "codes": [],
+            "rationale": "action search 合法且参数齐全，observation 支持 claim"
+          },
+          {
+            "step": 2,
+            "grounded": false,
+            "codes": [
+              "OBSERVATION_IGNORED",
+              "HANDOFF_LOSS"
+            ],
+            "rationale": "observation 为空，claim 却断言取消，且静默推翻前一步结论"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "D5_transfer_status",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "HANDOFF_LOSS",
+          2
+        ],
+        [
+          "CLAIM_MISMATCH",
+          2
+        ]
+      ],
+      "detector_detected": [
+        [
+          "HANDOFF_LOSS",
+          2
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": true,
+            "codes": [],
+            "rationale": "action search 合法且参数齐全，observation 支持 claim。"
+          },
+          {
+            "step": 2,
+            "grounded": false,
+            "codes": [
+              "OBSERVATION_IGNORED",
+              "HANDOFF_LOSS"
+            ],
+            "rationale": "observation 为空，claim 断言失败，且静默推翻前一步成功结论。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "D6_medical_handoff",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "HANDOFF_LOSS",
+          2
+        ],
+        [
+          "CLAIM_MISMATCH",
+          2
+        ]
+      ],
+      "detector_detected": [
+        [
+          "HANDOFF_LOSS",
+          2
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": true,
+            "codes": [],
+            "rationale": "工具存在且参数齐全，claim与observation一致"
+          },
+          {
+            "step": 2,
+            "grounded": false,
+            "codes": [
+              "OBSERVATION_IGNORED",
+              "HANDOFF_LOSS"
+            ],
+            "rationale": "observation为空，claim却断言恶化，且静默推翻前一步结论"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "D7_ecom_refund",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "HANDOFF_LOSS",
+          2
+        ],
+        [
+          "CLAIM_MISMATCH",
+          2
+        ]
+      ],
+      "detector_detected": [
+        [
+          "HANDOFF_LOSS",
+          2
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": true,
+            "codes": [],
+            "rationale": "action search 合法且参数齐全，claim 与 observation 一致。"
+          },
+          {
+            "step": 2,
+            "grounded": false,
+            "codes": [
+              "OBSERVATION_IGNORED",
+              "HANDOFF_LOSS"
+            ],
+            "rationale": "observation 为空，claim 却断言未到账，且静默推翻前一步结论。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "E2_legal_scope",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "SCOPE_DRIFT",
+          1
+        ]
+      ],
+      "detector_detected": [],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "SCOPE_DRIFT"
+            ],
+            "rationale": "任务要求查询刑法条文，但agent搜索的是民法条文，属于跑题。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "E3_finance_scope",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "SCOPE_DRIFT",
+          1
+        ]
+      ],
+      "detector_detected": [],
+      "judge": {
+        "case_hallucinated": false,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": true,
+            "codes": [],
+            "rationale": "action search 是注册工具且参数齐全，claim 与 observation 一致。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "E4_medical_scope",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "SCOPE_DRIFT",
+          1
+        ]
+      ],
+      "detector_detected": [],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "SCOPE_DRIFT"
+            ],
+            "rationale": "任务要求查询感冒用药，但agent搜索了高血压用药，属于跑题。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "E5_policy_scope",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "SCOPE_DRIFT",
+          1
+        ]
+      ],
+      "detector_detected": [],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "SCOPE_DRIFT"
+            ],
+            "rationale": "任务要求查询教育政策，但agent搜索了医疗政策，属于跑题。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "F2_booking_person",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "PARAM_FABRICATION",
+          1
+        ],
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ],
+        [
+          "PARAM_FABRICATION",
+          1
+        ],
+        [
+          "SCHEMA_VIOLATION",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "OBSERVATION_IGNORED",
+              "OVERCONFIDENT_ASSERTION"
+            ],
+            "rationale": "observation 显示未找到该用户，但 claim 断言预订了3间标准房，直接忽略失败观察并做出无依据的断言。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "F3_calendar_event",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "PARAM_FABRICATION",
+          1
+        ],
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ],
+        [
+          "OVERCONFIDENT_ASSERTION",
+          1
+        ],
+        [
+          "PARAM_FABRICATION",
+          1
+        ],
+        [
+          "SCHEMA_VIOLATION",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "HALLUCINATED_TOOL",
+              "PARAM_FABRICATION",
+              "OBSERVATION_IGNORED",
+              "OVERCONFIDENT_ASSERTION"
+            ],
+            "rationale": "action 'search' 不在注册表中，且参数 'event' 非 required 参数；observation 显示未找到事件，但 claim 断言事件存在，且无依据。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "F4_bill_account",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "PARAM_FABRICATION",
+          1
+        ],
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ],
+        [
+          "PARAM_FABRICATION",
+          1
+        ],
+        [
+          "SCHEMA_VIOLATION",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "HALLUCINATED_TOOL",
+              "SCHEMA_VIOLATION",
+              "OBSERVATION_IGNORED",
+              "PARAM_FABRICATION"
+            ],
+            "rationale": "action 'search' 不在注册表中，且输入缺少 required 参数 'query'；observation 未找到账户，claim 却断言余额为100元。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "F5_search_person",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "PARAM_FABRICATION",
+          1
+        ],
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ],
+        [
+          "PARAM_FABRICATION",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "OBSERVATION_IGNORED",
+              "OVERCONFIDENT_ASSERTION"
+            ],
+            "rationale": "observation显示未匹配到联系人，但agent_claim却断言了联系方式，直接忽略失败观察并过度自信。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "F6_crm_customer",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "PARAM_FABRICATION",
+          1
+        ],
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ],
+        [
+          "PARAM_FABRICATION",
+          1
+        ],
+        [
+          "SCHEMA_VIOLATION",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "HALLUCINATED_TOOL",
+              "SCHEMA_VIOLATION",
+              "OBSERVATION_IGNORED",
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "action 'search' 不在注册表，且输入缺 required 参数 'query'；observation 未找到客户，claim 却断言白金等级。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "F7_weather_city2",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "PARAM_FABRICATION",
+          1
+        ],
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ],
+        [
+          "PARAM_FABRICATION",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "OBSERVATION_IGNORED",
+              "OVERCONFIDENT_ASSERTION"
+            ],
+            "rationale": "observation 显示未找到该城市，但 agent_claim 却断言天气晴朗，忽略失败观察并过度自信。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "G2_stock_zero",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "OBSERVATION_IGNORED",
+          1
+        ],
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ],
+        [
+          "OBSERVATION_IGNORED",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "OBSERVATION_IGNORED",
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "observation显示现价0元停牌，但claim称现价50元且成交500手，直接矛盾且忽略失败观察。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "G3_inventory_zero",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "OBSERVATION_IGNORED",
+          1
+        ],
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ],
+        [
+          "OBSERVATION_IGNORED",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "OBSERVATION_IGNORED",
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "observation显示库存为0件，但agent声称100件，直接矛盾且忽略观察结果。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "G4_sensor_zero",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "OBSERVATION_IGNORED",
+          1
+        ],
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ],
+        [
+          "OBSERVATION_IGNORED",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "OBSERVATION_IGNORED",
+              "OVERCONFIDENT_ASSERTION"
+            ],
+            "rationale": "observation显示温度为0度，但agent声称25度且已完成采集，忽略观察结果并过度自信断言。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "G5_points_zero",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "OBSERVATION_IGNORED",
+          1
+        ],
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ],
+        [
+          "OBSERVATION_IGNORED",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "OBSERVATION_IGNORED",
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "observation显示用户积分0分，但claim声称5000分已到账，直接矛盾且忽略零值。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "G6_account_zero",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "OBSERVATION_IGNORED",
+          1
+        ],
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ],
+        [
+          "OBSERVATION_IGNORED",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "OBSERVATION_IGNORED",
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "observation显示账户可用额度为0元，但claim声称50000元已激活，直接矛盾且忽略零值。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "H2_feb30",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "OVERCONFIDENT_ASSERTION",
+          1
+        ],
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ],
+        [
+          "OVERCONFIDENT_ASSERTION",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "observation 说婚礼定于2月28日，但 agent_claim 说2月30日，直接矛盾。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "H3_cure_rate_pct",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "OVERCONFIDENT_ASSERTION",
+          1
+        ],
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ],
+        [
+          "OVERCONFIDENT_ASSERTION",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "observation 显示治愈率60%，但 agent_claim 声称150%，直接矛盾。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "H4_efficiency_pct",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "OVERCONFIDENT_ASSERTION",
+          1
+        ],
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ],
+        [
+          "OVERCONFIDENT_ASSERTION",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "observation 显示能量转换效率为30%，但 agent_claim 声称150%，直接矛盾。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "H5_land_pct",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "OVERCONFIDENT_ASSERTION",
+          1
+        ],
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ],
+        [
+          "OVERCONFIDENT_ASSERTION",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "observation 显示陆地占比30%，但 agent_claim 声称150%，直接矛盾。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "H6_jun31",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "OVERCONFIDENT_ASSERTION",
+          1
+        ],
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ],
+        [
+          "OVERCONFIDENT_ASSERTION",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "observation 明确说财报6月30日发布，但 agent_claim 说6月31日，日期矛盾。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "H7_sugar_pct",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "OVERCONFIDENT_ASSERTION",
+          1
+        ],
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ],
+        [
+          "OVERCONFIDENT_ASSERTION",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "observation 显示糖分占比为30%，但 agent_claim 声称150%，直接矛盾。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "I2_weight_unit",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": false,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": true,
+            "codes": [],
+            "rationale": "action search 是注册工具且含 required 参数 query；observation 返回 '包裹重量500'，claim '包裹重量500千克' 与 observation 一致，未发现失效。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "I3_growth_pct",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": false,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": true,
+            "codes": [],
+            "rationale": "action search 合法且参数齐全，observation 为'增长率5'，claim 为'增长率5%'，虽未明确百分号但可合理推断，无矛盾。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "I4_dose_unit",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": false,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": true,
+            "codes": [],
+            "rationale": "action为注册表工具search，参数query齐全；claim与observation一致，无失败或矛盾。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "I5_power_unit",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": false,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": true,
+            "codes": [],
+            "rationale": "action 'search' 是注册工具且含必填参数 query；observation 返回 '耗电0.5'，claim '耗电0.5度' 与之相符。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "I6_price_unit",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": false,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": true,
+            "codes": [],
+            "rationale": "action search 是注册表工具且参数齐全；observation 为 '价格100'，claim '价格100元' 与之相符。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "J2_flight_loop",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "LOOP",
+          2
+        ]
+      ],
+      "detector_detected": [
+        [
+          "LOOP",
+          2
+        ],
+        [
+          "LOOP",
+          3
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": true,
+            "codes": [],
+            "rationale": "action search 合法且参数齐全，claim 与 observation 一致。"
+          },
+          {
+            "step": 2,
+            "grounded": true,
+            "codes": [
+              "REDUNDANT_STEP"
+            ],
+            "rationale": "重复相同搜索，无信息增益。"
+          },
+          {
+            "step": 3,
+            "grounded": true,
+            "codes": [
+              "REDUNDANT_STEP"
+            ],
+            "rationale": "再次重复相同搜索，无信息增益。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "J3_order_retry",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "RETRY_STORM",
+          3
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ],
+        [
+          "CLAIM_MISMATCH",
+          2
+        ],
+        [
+          "CLAIM_MISMATCH",
+          3
+        ],
+        [
+          "REDUNDANT_STEP",
+          2
+        ],
+        [
+          "RETRY_STORM",
+          3
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": false,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": true,
+            "codes": [],
+            "rationale": "action合法，参数完整，observation未找到订单，claim继续查询合理"
+          },
+          {
+            "step": 2,
+            "grounded": true,
+            "codes": [],
+            "rationale": "action合法，参数完整，observation未找到订单，claim继续查询合理"
+          },
+          {
+            "step": 3,
+            "grounded": true,
+            "codes": [],
+            "rationale": "action合法，参数完整，observation显示订单已发货，claim查询完成合理"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "J4_schedule_loop",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "LOOP",
+          2
+        ]
+      ],
+      "detector_detected": [
+        [
+          "LOOP",
+          2
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": true,
+            "codes": [],
+            "rationale": "action search 合法且参数齐全，claim 与 observation 一致。"
+          },
+          {
+            "step": 2,
+            "grounded": true,
+            "codes": [
+              "REDUNDANT_STEP"
+            ],
+            "rationale": "重复相同搜索，无信息增益。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "J5_payment_retry",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "RETRY_STORM",
+          3
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ],
+        [
+          "CLAIM_MISMATCH",
+          2
+        ],
+        [
+          "REDUNDANT_STEP",
+          2
+        ],
+        [
+          "RETRY_STORM",
+          3
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "OBSERVATION_IGNORED",
+              "RETRY_STORM"
+            ],
+            "rationale": "observation显示支付超时，但claim声称重试中，且后续连续重试形成风暴。"
+          },
+          {
+            "step": 2,
+            "grounded": false,
+            "codes": [
+              "OBSERVATION_IGNORED",
+              "RETRY_STORM"
+            ],
+            "rationale": "observation仍为支付超时，claim声称重试中，且与上一步构成连续重试。"
+          },
+          {
+            "step": 3,
+            "grounded": true,
+            "codes": [],
+            "rationale": "observation显示支付成功，claim与之一致，任务完成。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "J6_crawl_loop",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "LOOP",
+          2
+        ]
+      ],
+      "detector_detected": [
+        [
+          "LOOP",
+          2
+        ],
+        [
+          "LOOP",
+          3
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": true,
+            "codes": [],
+            "rationale": "action search 合法且参数齐全，claim 与 observation 一致"
+          },
+          {
+            "step": 2,
+            "grounded": true,
+            "codes": [
+              "LOOP"
+            ],
+            "rationale": "重复调用相同 search 且参数相同，无信息增益"
+          },
+          {
+            "step": 3,
+            "grounded": true,
+            "codes": [
+              "LOOP"
+            ],
+            "rationale": "再次重复相同 search，冗余步骤"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "J7_queue_retry",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "RETRY_STORM",
+          3
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ],
+        [
+          "CLAIM_MISMATCH",
+          2
+        ],
+        [
+          "CLAIM_MISMATCH",
+          3
+        ],
+        [
+          "REDUNDANT_STEP",
+          2
+        ],
+        [
+          "REDUNDANT_STEP",
+          3
+        ],
+        [
+          "RETRY_STORM",
+          3
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "OBSERVATION_IGNORED",
+              "OVERCONFIDENT_ASSERTION"
+            ],
+            "rationale": "observation 显示任务异常，但 agent 声称排队中，忽略失败观察且无依据断言。"
+          },
+          {
+            "step": 2,
+            "grounded": false,
+            "codes": [
+              "OBSERVATION_IGNORED",
+              "OVERCONFIDENT_ASSERTION"
+            ],
+            "rationale": "observation 显示任务异常，但 agent 声称排队中，忽略失败观察且无依据断言。"
+          },
+          {
+            "step": 3,
+            "grounded": false,
+            "codes": [
+              "OBSERVATION_IGNORED",
+              "OVERCONFIDENT_ASSERTION"
+            ],
+            "rationale": "observation 显示任务异常，但 agent 声称排队中，忽略失败观察且无依据断言。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "K1_order_to_invoice",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "CLAIM_MISMATCH",
+          2
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          2
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": true,
+            "codes": [],
+            "rationale": "lookup_order是注册工具，参数order_id齐全，claim与observation一致。"
+          },
+          {
+            "step": 2,
+            "grounded": false,
+            "codes": [
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "observation显示发票金额1234.56元，但claim声称1234.00元，与observation矛盾。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "K2_symptom_to_drug",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "CLAIM_MISMATCH",
+          2
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          2
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": true,
+            "codes": [],
+            "rationale": "action search 合法且参数齐全，claim 与 observation 一致。"
+          },
+          {
+            "step": 2,
+            "grounded": false,
+            "codes": [
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "claim 中剂量800mg与observation中500mg矛盾。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "K3_quote_to_contract",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "CLAIM_MISMATCH",
+          2
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          2
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": true,
+            "codes": [],
+            "rationale": "action search 合法且参数齐全，claim 与 observation 一致。"
+          },
+          {
+            "step": 2,
+            "grounded": false,
+            "codes": [
+              "CLAIM_MISMATCH",
+              "OVERCONFIDENT_ASSERTION"
+            ],
+            "rationale": "claim 称合同金额8万元，但 observation 为5万元，直接矛盾且无依据。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "K4_weather_to_flight",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "CLAIM_MISMATCH",
+          2
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          2
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": true,
+            "codes": [],
+            "rationale": "get_weather 是注册工具，参数 city 齐全，observation 与 claim 一致。"
+          },
+          {
+            "step": 2,
+            "grounded": false,
+            "codes": [
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "observation 显示延误120分钟，claim 却说延误12分钟，数字矛盾。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "L1_weather_transit",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ],
+        [
+          "CLAIM_MISMATCH",
+          2
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ],
+        [
+          "CLAIM_MISMATCH",
+          2
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "observation显示降雨量25毫米，但claim声称250毫米，直接矛盾。"
+          },
+          {
+            "step": 2,
+            "grounded": false,
+            "codes": [
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "observation显示3号线运营，但claim声称8号线停运，与观察不符且无依据。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "L2_order_calc",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "OBSERVATION_IGNORED",
+          1
+        ],
+        [
+          "CLAIM_MISMATCH",
+          2
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ],
+        [
+          "CLAIM_MISMATCH",
+          2
+        ],
+        [
+          "OBSERVATION_IGNORED",
+          1
+        ],
+        [
+          "PARAM_FABRICATION",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "OBSERVATION_IGNORED",
+              "OVERCONFIDENT_ASSERTION"
+            ],
+            "rationale": "observation显示订单状态为空，但claim断言已发货共3件，无依据且忽略空状态。"
+          },
+          {
+            "step": 2,
+            "grounded": false,
+            "codes": [
+              "CLAIM_MISMATCH"
+            ],
+            "rationale": "计算器输出99.9，但claim声称折扣后100元，数值不一致。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "L3_medical_multi",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "OBSERVATION_IGNORED",
+          1
+        ],
+        [
+          "CLAIM_MISMATCH",
+          1
+        ],
+        [
+          "CLAIM_MISMATCH",
+          2
+        ]
+      ],
+      "detector_detected": [
+        [
+          "CLAIM_MISMATCH",
+          1
+        ],
+        [
+          "CLAIM_MISMATCH",
+          2
+        ],
+        [
+          "OBSERVATION_IGNORED",
+          1
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": false,
+            "codes": [
+              "OBSERVATION_IGNORED",
+              "OVERCONFIDENT_ASSERTION"
+            ],
+            "rationale": "观察显示白细胞计数为0，但声称确认5000，忽略零值并断言成功。"
+          },
+          {
+            "step": 2,
+            "grounded": false,
+            "codes": [
+              "OBSERVATION_IGNORED",
+              "OVERCONFIDENT_ASSERTION"
+            ],
+            "rationale": "观察显示推荐剂量500毫克，但声称5000毫克，忽略观察值并断言错误剂量。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "M1_amount_poison",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "HANDOFF_LOSS",
+          2
+        ]
+      ],
+      "detector_detected": [
+        [
+          "HANDOFF_LOSS",
+          2
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": true,
+            "codes": [],
+            "rationale": "lookup_order是注册工具，参数order_id齐全，claim与observation一致。"
+          },
+          {
+            "step": 2,
+            "grounded": false,
+            "codes": [
+              "HANDOFF_LOSS"
+            ],
+            "rationale": "后续步骤静默将金额从500改为800，无纠正标记，推翻前序结论。"
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "M2_weather_poison",
+      "suite": "all",
+      "author_label": "hallucinated",
+      "author_expected": [
+        [
+          "HANDOFF_LOSS",
+          2
+        ]
+      ],
+      "detector_detected": [
+        [
+          "HANDOFF_LOSS",
+          2
+        ]
+      ],
+      "judge": {
+        "case_hallucinated": true,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": true,
+            "codes": [],
+            "rationale": "get_weather is a registered tool with required city parameter provided; claim matches observation."
+          },
+          {
+            "step": 2,
+            "grounded": false,
+            "codes": [
+              "CLAIM_MISMATCH",
+              "HANDOFF_LOSS"
+            ],
+            "rationale": "Claim contradicts observation (says sunny 30 but observation says storm 28) and silently overturns step 1 conclusion without correction."
+          }
+        ],
+        "raw_ok": true
+      }
+    },
+    {
+      "id": "N1_balance_probe",
+      "suite": "all",
+      "author_label": "clean",
+      "author_expected": [],
+      "detector_detected": [],
+      "judge": {
+        "case_hallucinated": false,
+        "steps": [
+          {
+            "step": 1,
+            "grounded": true,
+            "codes": [],
+            "rationale": "action search 是注册工具且参数齐全，observation 直接支撑 claim，无矛盾。"
+          }
+        ],
+        "raw_ok": true
+      }
+    }
+  ]
+}

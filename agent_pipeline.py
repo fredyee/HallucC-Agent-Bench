@@ -134,7 +134,7 @@ def evaluate_trajectory(
         return result
 
     # ===== 1. 规则层（0 LLM）=====
-    base, steps_checks, failure_modes, per_step_meta = _rule_layer(steps, tool_schemas, task)
+    base, steps_checks, failure_modes, per_step_meta = _rule_layer(steps, tool_schemas, task, speed=speed)
     result.steps = steps_checks
     result.failure_modes = failure_modes
     result.base = base
@@ -169,14 +169,14 @@ def evaluate_trajectory(
     # ===== 维度聚合 + 传播链 =====
     result.dimensions = _aggregate_dimensions(base, per_step_meta, dim_scores, speed)
     result.hallucinated_steps = _count_hallucinated(steps_checks)
-    result.propagation = _propagation_path(per_step_meta, failure_modes)
+    result.propagation = _propagation_path(per_step_meta, failure_modes, speed=speed)
 
     return result
 
 
 # ============================ 规则层 ============================
 
-def _rule_layer(steps: list[dict], tool_schemas: dict | None, task: str = ""):
+def _rule_layer(steps: list[dict], tool_schemas: dict | None, task: str = "", *, speed: str = "standard"):
     """规则层（0 LLM）：agent_eval + math_checker + nli_model + _is_obviously_false
     + P2 确定性失败模式探测器（failure_modes.py）。
 
@@ -187,6 +187,7 @@ def _rule_layer(steps: list[dict], tool_schemas: dict | None, task: str = ""):
       - P2 逐 步：param_fabrication / observation_ignored
       - P2 轨迹级：redundant_step / retry_storm / handoff_loss
     task 供 param_fabrication 的上下文来源校验（agent 调用前可知的原始指令）。
+    speed 透传给 NLI tier 选择（deep→330M）与 detect_handoff_loss（deep→330M）。
     返回 (base, steps_checks, failure_modes, per_step_meta)。
     """
     base = _rule_evaluate(list(steps), tool_schemas)
@@ -242,11 +243,12 @@ def _rule_layer(steps: list[dict], tool_schemas: dict | None, task: str = ""):
             _ensure_failure_mode(failure_modes, "CLAIM_MISMATCH", step_no, "high")
 
         # --- nli_model: observation↔claim 语义蕴含 ---
+        # speed=deep → 330M 精审；否则 110M（同步 claim↔obs 可信 NLI 裸判，Lesson 36）
         nli = None
         if obs and claim:
             try:
                 from nli_model import evaluate_faithfulness
-                nli = evaluate_faithfulness(claim, obs)
+                nli = evaluate_faithfulness(claim, obs, tier=("deep" if speed == "deep" else "fast"))
             except Exception as e:
                 logger.warning("nli 评估失败(step %s): %s", step_no, str(e)[:80])
                 nli = None
@@ -258,6 +260,26 @@ def _rule_layer(steps: list[dict], tool_schemas: dict | None, task: str = ""):
                 "source": "nli_model", "confidence": round(nli.get("score", 0.5), 2),
             })
             _ensure_failure_mode(failure_modes, "CLAIM_MISMATCH", step_no, "high")
+
+        # --- claim_alignment: 关键实体一致性（补 Jaccard 高重叠漏判）---
+        # 整体相似度 ≥0.5 但数字/ID/单位被篡改时仍发 CLAIM_MISMATCH（A/B/I 例）。
+        # 与 nli_model 互补：NLI 抓语义矛盾，claim_alignment 抓精确实体篡改；
+        # 两者均纯规则/确定性，NLI 不可用时仍生效。
+        if obs and claim:
+            try:
+                from claim_alignment import compare as ca_compare
+                ca = ca_compare(obs, claim)
+            except Exception as e:
+                logger.warning("claim_alignment 失败(step %s): %s", step_no, str(e)[:80])
+                ca = None
+            if ca:
+                types = [m["type"] for m in ca.get("mismatches", [])]
+                sc["checks"].append({
+                    "type": "claim_mismatch", "verdict": "mismatch",
+                    "detail": f"关键实体不一致: {','.join(types)}",
+                    "source": "claim_alignment", "confidence": ca.get("confidence", 0.8),
+                })
+                _ensure_failure_mode(failure_modes, "CLAIM_MISMATCH", step_no, "high")
 
         # --- observation 相似度（供裁判层升级判定）---
         if obs and claim:
@@ -276,10 +298,12 @@ def _rule_layer(steps: list[dict], tool_schemas: dict | None, task: str = ""):
                 break
 
         # --- P2 确定性失败模式探测器（逐 步）---
-        # param_fabrication：参数含刚性 ID 但 task/前序观察与声称中无来源
+        # param_fabrication：参数含刚性 ID 但 task/前序观察与声称中无来源；
+        # 非刚性 ID 路径：obs 否定 + claim 仍断言查询的字符串参数值（F 例）
         ctx_text = " ".join(context_parts)
         _apply_findings(
-            detect_param_fabrication(step_no, ns["action_input"], ctx_text),
+            detect_param_fabrication(step_no, ns["action_input"], ctx_text,
+                                     observation=obs, claim=claim),
             steps_checks, failure_modes,
         )
         # observation_ignored：观察显式失败/为空却声称成功
@@ -303,7 +327,7 @@ def _rule_layer(steps: list[dict], tool_schemas: dict | None, task: str = ""):
     # --- P2 确定性失败模式探测器（轨迹级）---
     _apply_findings(detect_redundant_steps(normalized), steps_checks, failure_modes)
     _apply_findings(detect_retry_storm(normalized), steps_checks, failure_modes)
-    _apply_findings(detect_handoff_loss(per_step_meta), steps_checks, failure_modes)
+    _apply_findings(detect_handoff_loss(per_step_meta, speed=speed), steps_checks, failure_modes)
 
     return base, steps_checks, failure_modes, per_step_meta
 
@@ -603,18 +627,19 @@ def _count_hallucinated(steps_checks: list[dict]) -> int:
                       for c in sc.get("checks", [])))
 
 
-def _propagation_confidence(later_claim: str, src_claim: str) -> float:
+def _propagation_confidence(later_claim: str, src_claim: str, *, tier: str = "fast") -> float:
     """后续 claim 是否派生自源（幻觉）claim。
 
     nli 判 supported → 取其 score；contradicted → 0.0（属 HANDOFF_LOSS，非传播）；
     否则回退文本相似度。测试环境 nli 不可用 → 走文本相似度。
+    tier 透传 NLI 选档（deep→330M）；默认 fast/110M。
     """
     if not later_claim or not src_claim:
         return 0.0
     nli = None
     try:
         from nli_model import evaluate_faithfulness
-        nli = evaluate_faithfulness(src_claim, later_claim)
+        nli = evaluate_faithfulness(src_claim, later_claim, tier=tier)
     except Exception as e:  # noqa: BLE001
         logger.warning("propagation nli 失败: %s", str(e)[:80])
     if nli:
@@ -625,13 +650,15 @@ def _propagation_confidence(later_claim: str, src_claim: str) -> float:
     return _text_similarity(src_claim, later_claim)
 
 
-def _propagation_path(per_step_meta: list[dict], failure_modes: list[dict]) -> list[dict]:
+def _propagation_path(per_step_meta: list[dict], failure_modes: list[dict], *, speed: str = "standard") -> list[dict]:
     """P2: 语义传播 DAG——幻觉 claim 如何向后传播。
 
     源步（含失败模式的步）的 claim，扫描其后各步的 claim，若语义派生
     （nli supported 或文本相似度 ≥0.6）则记为下游。
     输出 {from_step, to_steps, claim, confidence}（替换 P1 的 step/action/failure_modes）。
+    speed 透传给 _propagation_confidence 的 NLI tier（deep→330M）。
     """
+    tier = "deep" if speed == "deep" else "fast"
     src_steps = {fm.get("step") for fm in failure_modes if fm.get("step") is not None}
     path: list[dict] = []
     for i, src in enumerate(per_step_meta):
@@ -642,7 +669,7 @@ def _propagation_path(per_step_meta: list[dict], failure_modes: list[dict]) -> l
         best_conf = 0.0
         for later in per_step_meta[i + 1:]:
             later_claim = (later.get("agent_claim") or later.get("final_answer") or "").strip()
-            conf = _propagation_confidence(later_claim, src_claim)
+            conf = _propagation_confidence(later_claim, src_claim, tier=tier)
             if conf >= 0.6:
                 to_steps.append(later["step"])
                 best_conf = max(best_conf, conf)
