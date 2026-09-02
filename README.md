@@ -45,7 +45,7 @@ pip install "halluc-detect[llm]"
 pip install "halluc-detect[nli]"
 ```
 
-> **可编辑安装说明**：`pip install -e .` 在仓库根目录执行。`server` 端模块（`pipeline`/`config`/`llm`/`search`）不在 `py-modules` 内，保持 wheel 精简；开发仓库内仍可经 repo-root-on-path 访问全栈，不影响本地开发。
+> **可编辑安装说明**：`pip install -e .` 在仓库根目录执行。wheel 打包 13 个开源模块（含精简版 `llm.py` 客户端，见 `pyproject.toml` 的 `py-modules`）。**open-core 边界**：生产裁判 prompt（`prompts.py`）与 `pipeline`/`config`/`search`/`domains` 等服务端模块不在此仓库——`import agent_pipeline` 顶层不拖入它们，fast 档零依赖；standard/deep 裁判层在 SaaS 侧运行。
 
 ## 使用
 
@@ -142,7 +142,7 @@ judge 仅见 `{task, trajectory}` + 工具注册表，不见作者 `expected_fai
 ## 许可证
 
 - **代码**：MIT（见 `LICENSE`）。
-- **基准数据集**（20 条植入轨迹 + 期望标签）：CC-BY-4.0。
+- **基准数据集**（HallucC-Agent-Bench 100 条轨迹用例 + 期望标签）：CC-BY-4.0。
 
 > 两层许可：代码 MIT 便于工具被引用与二次开发；数据集 CC-BY-4.0 保留署名要求。
 
