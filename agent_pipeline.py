@@ -170,6 +170,8 @@ def evaluate_trajectory(
     result.dimensions = _aggregate_dimensions(base, per_step_meta, dim_scores, speed)
     result.hallucinated_steps = _count_hallucinated(steps_checks)
     result.propagation = _propagation_path(per_step_meta, failure_modes, speed=speed)
+    # propagation_score 自传播链派生（去循环：不再依赖输入 has_hallucination 标签）
+    result.base.propagation_score = _propagation_score(result.propagation, result.total_steps)
 
     return result
 
@@ -182,7 +184,9 @@ def _rule_layer(steps: list[dict], tool_schemas: dict | None, task: str = "", *,
 
     在 agent_eval 的确定性检查之上，叠加：
       - math_checker: 声称/最终回答中的算式执行核验（P1 规则层组件）
-      - nli_model: observation↔claim 语义蕴含（Jaccard 抓不住的语义矛盾）
+      - nli_model: observation↔claim 语义蕴含（Jaccard 抓不住的语义矛盾），
+        并裁决 base 层的词法误判——词法相似度降为预筛，NLI 判一致则撤销
+        「观察与声称矛盾」，NLI 不可用时保持词法判定（宁误报不漏报）
       - _is_obviously_false: 常识矛盾（日期不可能、百分比>100、年份悖论）
       - P2 逐 步：param_fabrication / observation_ignored
       - P2 轨迹级：redundant_step / retry_storm / handoff_loss
@@ -200,6 +204,9 @@ def _rule_layer(steps: list[dict], tool_schemas: dict | None, task: str = "", *,
     # 当前步 obs 是本次调用结果，agent 调用前不可能已知）
     context_parts: list[str] = [task] if task else []
     per_step_meta: list[dict] = []
+    # 忠实度分数重算口径：与 base 一致（observation + agent_claim 同时存在），
+    # 但 NLI 判一致的步骤按其蕴含概率计，不被词法 0.2 拉成 0
+    faithful_scores_adj: list[float] = []
     for i, ns in enumerate(normalized):
         sc = steps_checks[i] if i < len(steps_checks) else {"step": ns["step"], "checks": []}
         step_no = ns["step"]
@@ -261,6 +268,39 @@ def _rule_layer(steps: list[dict], tool_schemas: dict | None, task: str = "", *,
             })
             _ensure_failure_mode(failure_modes, "CLAIM_MISMATCH", step_no, "high")
 
+        # --- 词法相似度降为预筛：NLI 判一致则撤销词法误判（Bug 4）---
+        # CLAIM_MISMATCH 原本拿词法重叠当否决条件：观察说「可退款」、声称说
+        # 「符合退款条件」语义一致，字符 Jaccard 只有 0.2，被当成矛盾拦成误报。
+        # NLI 可用时它是最终裁决者；NLI 不可用时保持词法判定（宁误报不漏报）。
+        # 只撤词法来源的误判——math_checker / claim_alignment / common_sense
+        # 与词法重叠无关，一条都不动。
+        if nli and nli.get("verdict") == "supported":
+            lex_mismatch = [
+                c for c in sc["checks"]
+                if c["type"] == "claim_mismatch" and c["verdict"] == "mismatch"
+                and c.get("source") in (None, "deterministic")
+                and c.get("detail", "").startswith("观察与声称相似度")
+            ]
+            if lex_mismatch:
+                for c in lex_mismatch:
+                    c["verdict"] = "pass"
+                    c["source"] = "nli_model"
+                    c["detail"] = (
+                        f"相似度 {c['confidence']} < 阈值 {CLAIM_MISMATCH_THRESHOLD}，"
+                        f"但 NLI 判一致(score={nli.get('score')})——撤销词法误判"
+                    )
+                    c["confidence"] = round(nli.get("score", 0.5), 2)
+                # 本步若无其他矛盾信号，收回该步的 CLAIM_MISMATCH 失败模式
+                if not any(
+                    c.get("verdict") in ("mismatch", "fail", "loop")
+                    for c in sc["checks"]
+                ):
+                    failure_modes[:] = [
+                        fm for fm in failure_modes
+                        if not (fm["code"] == "CLAIM_MISMATCH" and fm["step"] == step_no)
+                    ]
+                meta["nli_override_lexical"] = True
+
         # --- claim_alignment: 关键实体一致性（补 Jaccard 高重叠漏判）---
         # 整体相似度 ≥0.5 但数字/ID/单位被篡改时仍发 CLAIM_MISMATCH（A/B/I 例）。
         # 与 nli_model 互补：NLI 抓语义矛盾，claim_alignment 抓精确实体篡改；
@@ -283,7 +323,14 @@ def _rule_layer(steps: list[dict], tool_schemas: dict | None, task: str = "", *,
 
         # --- observation 相似度（供裁判层升级判定）---
         if obs and claim:
-            meta["obs_score"] = _text_similarity(obs, claim)
+            lex_score = _text_similarity(obs, claim)
+            meta["obs_score"] = lex_score
+            if ns["agent_claim"]:
+                supported = bool(nli) and nli.get("verdict") == "supported"
+                if supported and lex_score < CLAIM_MISMATCH_THRESHOLD:
+                    faithful_scores_adj.append(round(nli.get("score", 0.5), 2))
+                else:
+                    faithful_scores_adj.append(lex_score)
 
         # --- _is_obviously_false: 常识矛盾 ---
         for text in (claim, final_answer):
@@ -328,6 +375,15 @@ def _rule_layer(steps: list[dict], tool_schemas: dict | None, task: str = "", *,
     _apply_findings(detect_redundant_steps(normalized), steps_checks, failure_modes)
     _apply_findings(detect_retry_storm(normalized), steps_checks, failure_modes)
     _apply_findings(detect_handoff_loss(per_step_meta, speed=speed), steps_checks, failure_modes)
+
+    # step_efficiency 按 REDUNDANT_STEP/RETRY_STORM 重算覆盖 agent_eval 的 legacy 基值
+    # （unique_actions/n 误判同工具不同入参的合法多次调用；冗余信号只在 failure_modes 层可得）。
+    base.step_efficiency = _step_efficiency(failure_modes, len(normalized))
+
+    # output_faithfulness 覆盖 agent_eval 的纯词法口径：NLI 判一致的步骤按蕴含概率计，
+    # 否则「换个说法重述」会被 0.2 的相似度拉成 0（结论在 base 层已被污染）
+    if faithful_scores_adj:
+        base.output_faithfulness = sum(faithful_scores_adj) / len(faithful_scores_adj)
 
     return base, steps_checks, failure_modes, per_step_meta
 
@@ -681,6 +737,32 @@ def _propagation_path(per_step_meta: list[dict], failure_modes: list[dict], *, s
             "confidence": round(best_conf, 2) if to_steps else 0.7,
         })
     return path
+
+
+def _step_efficiency(failure_modes: list[dict], n: int) -> float:
+    """轨迹效率 = 1 − 冗余步占比。冗余 = REDUNDANT_STEP + RETRY_STORM 失败模式数。
+
+    LOOP 归 loop_detection 维度，不重复计入（failure_modes 设计：REDUNDANT_STEP 与 LOOP 互斥）。
+    替代 agent_eval 的 unique_actions/n 基值——后者误判同工具不同入参的合法多次调用。
+    """
+    if n <= 0:
+        return 1.0
+    redundant = sum(1 for fm in failure_modes
+                    if fm.get("code") in ("REDUNDANT_STEP", "RETRY_STORM"))
+    return round(max(0.0, 1.0 - redundant / n), 2)
+
+
+def _propagation_score(propagation_path: list[dict], n: int) -> float:
+    """传播分 = 1 − 被传播下游步占比。下游步 = 出现在任一 to_steps 中的步号数。
+
+    无传播边 → 1.0。去循环：自 _propagation_path（失败模式派生）计算，不依赖输入标签。
+    """
+    if n <= 0:
+        return 1.0
+    downstream = set()
+    for p in propagation_path:
+        downstream.update(p.get("to_steps", []))
+    return round(max(0.0, 1.0 - len(downstream) / n), 2)
 
 
 def _ensure_failure_mode(failure_modes: list, code: str, step: int, severity: str) -> None:

@@ -35,8 +35,10 @@ if not os.environ.get("HF_ENDPOINT"):
     os.environ["HF_ENDPOINT"] = "https://hf-mirror.com"
 
 # 双槽懒加载：每 tier 独立 slot，失败只 null 该 tier，不污染另一 tier。
-# slot = {"model","tokenizer","label_map","load_attempted"}
+# slot = {"model","tokenizer","label_map","load_attempted","load_in_progress"}
 # load_attempted：加载已尝试（成功或失败）——避免逐调用重试刷屏（尤其 deep 1.3GB 重下）
+# load_in_progress：加载进行中——status() 靠它区分「加载中」与「已失败」，
+# 否则 410MB 下载窗口期内仪表盘会把进行中误报成 failed（2026-10-13 亲历）。
 _slots: dict[str, dict] = {}
 
 
@@ -44,7 +46,8 @@ def _slot(tier: str) -> dict:
     """取/建 tier 的 slot（per-tier 独立 load_attempted 短路）。"""
     s = _slots.get(tier)
     if s is None:
-        s = {"model": None, "tokenizer": None, "label_map": None, "load_attempted": False}
+        s = {"model": None, "tokenizer": None, "label_map": None,
+             "load_attempted": False, "load_in_progress": False}
         _slots[tier] = s
     return s
 
@@ -86,12 +89,14 @@ def _load_model(tier: str = "fast") -> bool:
     if s["load_attempted"]:
         return s["model"] is not None
     s["load_attempted"] = True
+    s["load_in_progress"] = True
 
     name = _model_name_for(tier)
     try:
         import torch  # noqa: F401
         from transformers import AutoModelForSequenceClassification, AutoTokenizer
     except ImportError:
+        s["load_in_progress"] = False
         logger.warning(
             "transformers/torch 未安装，NLI 模型不可用(tier=%s)（pip install transformers torch）"
             "——HANDOFF_LOSS 降级为纠正标记回退",
@@ -121,6 +126,8 @@ def _load_model(tier: str = "fast") -> bool:
         s["model"] = None
         s["tokenizer"] = None
         return False
+    finally:
+        s["load_in_progress"] = False
 
 
 def warmup(tiers: tuple[str, ...] = ("fast", "deep")) -> None:
@@ -179,3 +186,69 @@ def evaluate_faithfulness(claim: str, evidence: str, *, tier: str = "fast") -> d
     except Exception as e:
         logger.warning("NLI 评估失败(tier=%s): %s", tier, str(e)[:100])
         return None
+
+
+def status() -> dict:
+    """NLI 可用性快照。**不触发模型加载**。
+
+    后台仪表盘每次刷新都会调它——若这里顺带加载模型，每次刷页都要付 8s。
+    `_slot()` 只建空 slot，不碰 from_pretrained。
+
+    state 四态是关键诊断信息，必须区分开：
+      not_attempted  本进程从未尝试加载（正常，等首次请求懒加载）
+      loading        加载进行中（410MB 下载窗口期）——瞬态，不是失败
+      failed         尝试过但失败——**这是要报警的状态**（缺依赖/装错环境/权重拉不下来）
+      loaded         已加载可用
+    """
+    import importlib.util
+
+    importable = (
+        importlib.util.find_spec("torch") is not None
+        and importlib.util.find_spec("transformers") is not None
+    )
+    tiers: dict[str, dict] = {}
+    for tier in ("fast", "deep"):
+        s = _slot(tier)
+        if s["model"] is not None:
+            state = "loaded"
+        elif s["load_in_progress"]:
+            state = "loading"
+        elif s["load_attempted"]:
+            state = "failed"
+        else:
+            state = "not_attempted"
+        tiers[tier] = {
+            "model": _model_name_for(tier),
+            "state": state,
+            "label_map": s["label_map"],
+        }
+    return {
+        "importable": importable,
+        "tiers": tiers,
+        "hf_endpoint": os.environ.get("HF_ENDPOINT"),
+        "override": os.environ.get("HALLUCC_NLI_MODEL"),
+    }
+
+
+def status_text(s: dict | None = None) -> str:
+    """单行人类可读状态，供后台列表/卡片直接展示。
+
+    s 可传入外部快照（如 admin 从后端 /health 读到的后端进程状态）；
+    不传则读本进程。快照结构必须来自 status()。
+    """
+    s = s if s is not None else status()
+    parts = []
+    for tier in ("fast", "deep"):
+        t = s["tiers"][tier]
+        name = t["model"].split("/")[-1]
+        if t["state"] == "loaded":
+            parts.append(f"{tier} {name} 可用")
+        elif t["state"] == "failed":
+            parts.append(f"{tier} {name} 加载失败")
+        elif t["state"] == "loading":
+            parts.append(f"{tier} {name} 加载中")
+        else:
+            parts.append(f"{tier} {name} 未加载")
+    if not s["importable"]:
+        return "NLI 不可用：torch/transformers 未安装" + "（" + "；".join(parts) + "）"
+    return "；".join(parts)

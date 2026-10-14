@@ -12,7 +12,13 @@ def check(text: str) -> list[dict]:
         result = _evaluate(expr["expression"])
         if result is None:
             continue
-        if abs(result - expr["claimed"]) > 0.001:
+        claimed = expr["claimed"]
+        # 舍入容差：声称值带小数位时，若按该小数位四舍五入后与实际一致，视为舍入差异非错误
+        # （如 10/3=3.3333 vs 声称 3.33 → 一致，不误报）。不引入相对容差——避免弱化年份/大数检测。
+        dp = _decimal_places(expr.get("claimed_str", ""))
+        if dp > 0 and round(result, dp) == round(claimed, dp):
+            continue
+        if abs(result - claimed) > 0.001:
             issues.append({
                 "type": "math_error",
                 "expression": expr["expression"],
@@ -21,6 +27,12 @@ def check(text: str) -> list[dict]:
                 "context": expr["context"],
             })
     return issues
+
+
+def _decimal_places(s: str) -> int:
+    """返回字符串表示的小数位数（'3.33' → 2；'9' → 0；'' → 0）。"""
+    parts = s.split(".")
+    return len(parts[1]) if len(parts) == 2 and parts[1] else 0
 
 
 def _extract_expressions(text: str) -> list[dict]:
@@ -35,10 +47,12 @@ def _extract_expressions(text: str) -> list[dict]:
             try:
                 expr_str = f"{m.group(1)} {m.group(2)} {m.group(3)}"
                 actual = eval(expr_str)
-                claimed = float(m.group(4))
+                claimed_str = m.group(4)
+                claimed = float(claimed_str)
                 results.append({
                     "expression": expr_str,
                     "claimed": claimed,
+                    "claimed_str": claimed_str,
                     "context": text[max(0, m.start()-20):m.end()+20],
                 })
             except (ValueError, SyntaxError, ZeroDivisionError):

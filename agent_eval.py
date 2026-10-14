@@ -63,6 +63,34 @@ def _norm_action_input(action_input: str | None) -> str:
     return s
 
 
+# 「没有观察/没有声称」的常见占位符。Agent 框架习惯把可选字段填成占位符
+# 而不是留空——「（无）」「N/A」「none」「-」都算。
+# 若当真内容参与「观察 ↔ 声称」比对，门禁会在占位符上判出与声称零相似的
+# CLAIM_MISMATCH 并把 output_faithfulness 打到 0：客户的分数被一个与其
+# Agent 质量无关的原因拖垮。占位符不是证据，在归一化时统一视为空串跳过比对。
+# agent_pipeline / guard_agent 共用本函数，改这一处即覆盖全部下游判定。
+_OBSERVATION_PLACEHOLDERS = frozenset({
+    "无", "N/A", "n/a", "NA", "na", "None", "none", "null", "NULL",
+    "-", "—", "不适用", "无数据", "无观察", "无结果", "无返回",
+})
+# 去括号时一并剥掉的全/半角包裹字符
+_PAREN_CHARS = " \t\r\n（）()[]【】〔〕「」\"'`"
+
+
+def _blank_if_placeholder(text) -> str:
+    """占位符视为空串；带实质内容的字符串原样返回。
+
+    只按整串精确匹配，所以「无数据，但系统返回了 xxx」这类以占位符开头、
+    后面跟了真内容的观察不会被误清空。
+    """
+    if not text:
+        return ""
+    t = str(text).strip()
+    if not t:
+        return ""
+    return "" if t.strip(_PAREN_CHARS) in _OBSERVATION_PLACEHOLDERS else t
+
+
 def _normalize_step(s: dict, idx: int) -> dict:
     """归一化两种 step schema 到统一内部表示。
 
@@ -74,9 +102,9 @@ def _normalize_step(s: dict, idx: int) -> dict:
         "thought": s.get("thought", ""),
         "action": s.get("action") or s.get("tool") or "",
         "action_input": s.get("action_input") or s.get("tool_input") or "",
-        "observation": s.get("observation") or s.get("tool_output") or "",
-        "agent_claim": s.get("agent_claim", ""),
-        "final_answer": s.get("final_answer", ""),
+        "observation": _blank_if_placeholder(s.get("observation") or s.get("tool_output")),
+        "agent_claim": _blank_if_placeholder(s.get("agent_claim")),
+        "final_answer": _blank_if_placeholder(s.get("final_answer")),
         "has_hallucination": s.get("has_hallucination", False),
     }
 
@@ -174,7 +202,6 @@ def evaluate(trajectory: list[dict], tool_schemas: dict | None = None) -> AgentE
     faithful_scores = []
     seen: set = set()
     loops = 0
-    hallucinated_steps = 0
 
     for s in steps:
         checks: list[dict] = []
@@ -244,23 +271,23 @@ def evaluate(trajectory: list[dict], tool_schemas: dict | None = None) -> AgentE
             failure_modes.append({"code": "LOOP", "step": step_no, "severity": "medium"})
         seen.add(key)
 
-        if s["has_hallucination"]:
-            hallucinated_steps += 1
-
         steps_checks.append({"step": step_no, "checks": checks})
 
     n = len(steps)
-    # 6. Propagation Score — hallucination 是否跨步骤传播
-    if hallucinated_steps > 1:
-        result.propagation_score = max(0.0, 1.0 - ((hallucinated_steps - 1) / n))
 
     # 聚合 6 维分数（保持原公式，确保 to_dict() 向后兼容）
     result.tool_correctness = 1.0 - (wrong_tools / n) if n else 1.0
     result.argument_correctness = 1.0 - (arg_issues / n) if n else 1.0
     result.output_faithfulness = sum(faithful_scores) / len(faithful_scores) if faithful_scores else 1.0
+    # step_efficiency 此处为 legacy 基值（unique_actions/n，会误判同工具不同入参的合法
+    # 多次调用）；正确值由 agent_pipeline._rule_layer 末尾按 REDUNDANT_STEP/RETRY_STORM
+    # 重算覆盖（冗余信号只在 pipeline 的 failure_modes 层可得，规则基 agent_eval 看不到）。
     unique_actions = len(set(s["action"] for s in steps))
     result.step_efficiency = min(1.0, unique_actions / n) if n else 1.0
     result.loop_detection = 1.0 - (loops / n) if n else 1.0
+    # propagation_score 不在此处计算：旧实现依赖输入 has_hallucination 标签（循环依赖，
+    # 生产无标签 → 恒 1.0 死指标）。现由 agent_pipeline 自失败模式派生传播链后在
+    # evaluate_trajectory 末尾设 base.propagation_score；此处默认 1.0 保留。
 
     result._steps_checks = steps_checks
     result._failure_modes = failure_modes
