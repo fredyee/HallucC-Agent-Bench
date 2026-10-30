@@ -1701,19 +1701,31 @@ def _build_standard_subset() -> list[BenchmarkCase]:
 STANDARD_SUBSET: list[BenchmarkCase] = _build_standard_subset()
 
 
+_REPO_ROOT = Path(__file__).resolve().parent
+
+
 def _write_json(payload: dict, write_json: str) -> None:
-    """写 canonical 路径 + 镜像到 web/public/eval_set/ 供前端 fetch。"""
+    """写 canonical 路径；canonical 在仓库内且前端目录存在时，镜像到 web/public/eval_set/。
+
+    2026-10-13 事故：旧实现用 path.parent.parent / "web"/... 推镜像路径，
+    canonical=/tmp/x.json 时解析成文件系统根的 /web/public/eval_set/ 并 mkdir 出来。
+    镜像只能锚定仓库根（__file__），绝不能从 canonical 路径反推。
+    """
     text = json.dumps(payload, ensure_ascii=False, indent=2)
-    path = Path(write_json)
+    path = Path(write_json).resolve()
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(text, encoding="utf-8")
-    # 镜像到前端 public 目录（standalone build 含），路径相对 hallucc/ 仓库根
-    web_mirror = path.parent.parent / "web" / "public" / "eval_set" / "agent_benchmark_results.json"
-    # 仅当 canonical 在 eval_set/ 下时镜像；否则用默认 public 路径
-    if path.name == "agent_benchmark_results.json":
-        web_mirror = Path("web/public/eval_set/agent_benchmark_results.json")
-    web_mirror.parent.mkdir(parents=True, exist_ok=True)
-    web_mirror.write_text(text, encoding="utf-8")
+    mirror_dir = _REPO_ROOT / "web" / "public" / "eval_set"
+    try:
+        inside_repo = path.is_relative_to(_REPO_ROOT)
+    except AttributeError:  # Python < 3.9
+        inside_repo = str(path).startswith(str(_REPO_ROOT) + "/")
+    if inside_repo and mirror_dir.is_dir():
+        mirror = mirror_dir / "agent_benchmark_results.json"
+        mirror.write_text(text, encoding="utf-8")
+        print(f"已落盘 {path}（镜像 → {mirror}）")
+    else:
+        print(f"已落盘 {path}（仓库外或无 web/public/，跳过前端镜像）")
 
 
 def run_and_persist(
@@ -1822,7 +1834,7 @@ def main(argv: list[str] | None = None, *, speed: str | None = None) -> None:
         default="all", help="套件选择（--speed fast/standard 时生效）")
     parser.add_argument(
         "--write-json", default=None, metavar="PATH",
-        help="落盘 JSON 路径（canonical）；同时镜像到 web/public/eval_set/")
+        help="落盘 JSON 路径（canonical）；在仓库内且存在 web/public/ 时镜像到 web/public/eval_set/")
     args = parser.parse_args(argv)
 
     if args.speed == "all":

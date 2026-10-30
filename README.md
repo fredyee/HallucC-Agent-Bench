@@ -1,19 +1,167 @@
 # halluc-detect
 
-> Agent 轨迹幻觉检测器 — HallucC Phase 1 开源旗舰。
-> **fast 档纯 Python stdlib，0 LLM 调用 / 0 网络搜索，离线可复现。**
+> Agent trajectory hallucination detector — the open-source Phase 1 flagship of [HallucC](https://aihcc.cloud).
+> **The fast tier is pure Python stdlib: 0 LLM calls / 0 web searches, fully offline-reproducible.**
 
-[English summary ↓ — 中文为主，文末附英文摘要]
+[中文版 ↓](#中文文档)
 
 ---
+
+## What it is
+
+`halluc-detect` is the **Phase 1 open-source flagship** of [HallucC](https://aihcc.cloud): a hallucination detector for LLM **agent execution trajectories** (not just final text), plus a Chinese regression benchmark. It turns "will the agent fabricate results with misplaced confidence" into something **runnable, reproducible, and zero-cost**.
+
+- **Detector**: runs tiered evaluation over an agent trajectory (thought / action / action_input / observation / agent_claim sequence) and outputs **six-dimension scores + per-step checks + 12 failure-mode codes + hallucination propagation chains**.
+- **Benchmark**: 100 Chinese agent trajectories (HallucC-Agent-Bench) = 20 contract regression cases (planted known hallucinations, recall=1.0 regression gate) + 80 adversarial cases (real distribution, quantifying generalization limits). Fast tier: 0 LLM / 0 search, real recall=0.945 / fp_rate=0.0.
+- **Independent circularity probe**: an independent LLM-as-judge (DeepSeek temp=0, blind — sees neither author labels nor detector output) re-labels all 100 cases, confirming ~86% of hallucination labels + 100% of clean ones (specificity=1.0, zero false positives), with a **low circularity-risk** verdict — breaking the "case author = detector author = annotator" circularity concern.
+- **Bonus dataset**: `eval_set/chinese_hallucination_benchmark.jsonl` — 100 annotated Chinese hallucination samples (~260 claims, 9 hallucination categories: fabricated facts, misattribution, data errors, temporal errors, etc.), CC-BY-4.0. See `eval_set/README.md`.
+
+> **Positioning**: this repo is a **detector + regression benchmark**, not an academic novelty claim.
+
+## Why the fast tier has zero dependencies
+
+The fast tier runs only the rule layer: regex + token similarity + arithmetic verification + common-sense contradictions + a bilingual marker lexicon. The rule layer was deliberately decoupled — `import agent_pipeline` no longer drags in the `server`/`config`/`llm`/`search` heavy stack, so:
+
+```bash
+pip install halluc-detect          # no extras needed for the fast tier
+halluc-detect bench                # 0 API quota, offline reproducible
+```
+
+The `standard` / `deep` tiers require the LLM judge layer (see [optional dependencies](#install)) and correspond to HallucC's paid SaaS.
+
+## Install
+
+```bash
+# Dev mode (inside the repo)
+git clone <repo> && cd HallucC-Agent-Bench
+pip install -e .
+
+# Fast tier only (0 dependencies)
+pip install halluc-detect
+
+# LLM judge layer (standard / deep tiers)
+pip install "halluc-detect[llm]"
+
+# NLI semantic entailment (observation↔claim contradiction detection)
+pip install "halluc-detect[nli]"
+```
+
+> **Editable install**: run `pip install -e .` at the repo root. The wheel packages 13 open-source modules (including the slimmed `llm.py` client — see `py-modules` in `pyproject.toml`). **Open-core boundary**: production judge prompts (`prompts.py`) and server-side modules such as `pipeline`/`config`/`search`/`domains` are **not** in this repo — `import agent_pipeline` does not pull them in; the fast tier is dependency-free; the standard/deep judge layer runs on the SaaS side.
+
+## Usage
+
+### `detect` — check a single trajectory
+
+```bash
+# Bare trajectory list via stdin (no tool_schemas → HALLUCINATED_TOOL/SCHEMA_VIOLATION skipped)
+echo '[
+  {"step":1,"action":"search","action_input":"{\"query\":\"order 12345\"}",
+   "observation":"order not found","agent_claim":"I found the details of order 12345"}
+]' | halluc-detect detect
+
+# File input (may include task / tool_schemas)
+halluc-detect detect trajectory.json --speed fast
+
+# Enable tool-schema validation (loads the benchmark's 5-tool registry)
+halluc-detect detect trajectory.json --tools demo
+```
+
+Each step accepts two schemas (normalized by `agent_eval._normalize_step`):
+
+| schema | fields |
+|---|---|
+| A | `step, thought, action, action_input, observation, final_answer` |
+| B | `step, tool, tool_input, tool_output, agent_claim` |
+
+Output is structured JSON (`evaluate_trajectory().to_dict()`): six-dimension `dimensions`, per-step `steps[].checks`, the `failure_modes` list, the `propagation` chain, and `llm_calls`/`search_calls` (both 0 in the fast tier).
+
+### `bench` — run the Chinese benchmark
+
+```bash
+# Text report (fast tier by default)
+halluc-detect bench
+
+# Structured JSON
+halluc-detect bench --json
+
+# Standard tier (requires [llm] extra + API key)
+halluc-detect bench --speed standard
+```
+
+Fast-tier acceptance gates: `recall ≥ 0.80`, `fp_rate ≤ 0.15`. Current fast tier (100 cases):
+
+| suite | n | recall | fp_rate | notes |
+|---|---|---|---|---|
+| contract regression | 20 | 1.0 | 0.0 | planted known hallucinations, regression gate (by design) |
+| adversarial | 80 | 0.937 | 0.0 | real distribution; all 5 FNs are COVERAGE_GAP (LLM-only modes, fast tier by design does not cover) |
+| total | 100 | 0.945 | 0.0 | 0 LLM / 0 search |
+
+Persisted snapshot: `eval_set/agent_benchmark_results.json` (includes a standard-tier subset of 20, recall=1.0).
+
+### `judge` — independent circularity probe
+
+```bash
+# Independent LLM judge blind-labels all 100 cases (requires [llm] extra + API key)
+python agent_benchmark_judge.py
+# Sampled smoke run
+python agent_benchmark_judge.py --limit 20
+```
+
+The judge sees only `{task, trajectory}` + the tool registry — not the author's `expected_failure_modes`, not the detector's output — and independently decides whether each step is grounded. It produces three-way agreement rates (judge↔author labels, judge↔author codes, judge↔detector) + template-effective-evidence deduplication + a circularity-risk verdict.
+
+Current snapshot (`eval_set/judge_relabel.json`, DeepSeek temp=0): judge recall=0.857 / specificity=1.0 (TP=78 FN=13 TN=9 FP=0), template redundancy reduced 100→41 independent pieces of evidence, circularity-risk verdict **low**. DeepSeek temp=0 is not fully deterministic; a single run carries ±1 FN noise.
+
+## Failure-mode codes (12)
+
+**Deterministic (reportable in fast tier, 10):**
+
+| code | meaning |
+|---|---|
+| `HALLUCINATED_TOOL` | calling a tool not in the registry |
+| `PARAM_FABRICATION` | parameter contains a rigid ID (order number / UUID) with no source in context |
+| `SCHEMA_VIOLATION` | parameters violate the tool's JSON Schema |
+| `OBSERVATION_IGNORED` | observation explicitly failed / is empty, yet success is claimed |
+| `CLAIM_MISMATCH` | observation and claim disagree (similarity below threshold / arithmetic wrong / NLI contradiction) |
+| `LOOP` | same action+input repeated |
+| `RETRY_STORM` | same tool with ≥3 different inputs including failed observations |
+| `REDUNDANT_STEP` | different calls but highly duplicated observations (≥0.8) |
+| `HANDOFF_LOSS` | a later claim corrects / overturns an earlier claim |
+| `OVERCONFIDENT_ASSERTION` | common-sense contradiction (impossible date / percentage >100 / year paradox) |
+
+**LLM-only (standard / deep tiers, 2):** `SCOPE_DRIFT` (drifting off-task mid-run), `PREMATURE_STOP` (final answer fails to deliver the task).
+
+## Differentiation
+
+- **Bilingual marker lexicon**: CN literals preserved verbatim + EN word-boundary matching (`\b` avoids false hits like "foundry"/"nullable") + JSON/HTTP-scoped regex (`"status": 503` avoids misreading bare numbers as arithmetic results).
+- **CN-first multi-domain benchmark**: 100 trajectories covering orders / search / calculation / translation / weather / medical / finance / logistics (20 contract + 80 adversarial) — existing agent-hallucination benchmarks skew EN.
+- **Circularity self-evidence**: the blind independent judge breaks the "detector catches its own templates" concern — if that were true, recall would approach 0, not the measured 0.857.
+- **Tiered evaluation + false-positive control**: insufficient evidence → `unverified`, never forced `refuted` (consistent with the HallucC main line). The rule layer hands only genuinely "uncertain" items to the judge layer, avoiding full-volume LLM calls.
+
+**Phase 2 (planned)**: public leaderboard (detector axis + agent axis).
+
+## License
+
+- **Code**: MIT (see `LICENSE`).
+- **Benchmark datasets** (HallucC-Agent-Bench 100 trajectory cases + expected labels; Chinese hallucination eval set): CC-BY-4.0.
+
+> Two-tier licensing: MIT for code encourages citation and derivative work; CC-BY-4.0 for datasets keeps the attribution requirement.
+
+---
+---
+
+# 中文文档
+
+> Agent 轨迹幻觉检测器 — HallucC Phase 1 开源旗舰。
+> **fast 档纯 Python stdlib，0 LLM 调用 / 0 网络搜索，离线可复现。**
 
 ## 这是什么
 
 `halluc-detect` 是 [HallucC](https://aihcc.cloud) 的 **Phase 1 开源旗舰**：一个针对 LLM Agent 执行轨迹（trajectory）的幻觉检测器 + 中文回归基准。它把"Agent 会不会在不该自信的地方编造结果"这件事变成**可跑、可复现、0 成本**的自动化检测。
 
-- **检测器**：对一条 Agent 轨迹（thought / action / action_input / observation / agent_claim 序列）跑分层递进评估，输出**六维分数 + 逐 步 checks + 12 类失败模式码 + 幻觉传播链**。
+- **检测器**：对一条 Agent 轨迹（thought / action / action_input / observation / agent_claim 序列）跑分层递进评估，输出**六维分数 + 逐步 checks + 12 类失败模式码 + 幻觉传播链**。
 - **基准**：100 条中文 Agent 轨迹（HallucC-Agent-Bench）= 20 契约回归（planted 已知幻觉，recall=1.0 回归门）+ 80 对抗（真实分布，量化泛化边界）。fast 档 0 LLM / 0 搜索，真实 recall=0.945 / fp_rate=0.0。
 - **独立循环质疑**：独立 LLM-as-judge（DeepSeek temp=0，盲标——不见作者标签、不见检测器检出）复核全 100 条，确认 ~86% 幻觉标签 + 100% 干净（specificity=1.0，零误报），裁定「循环风险低」——打破「用例作者=检测器作者=标注者」的循环质疑。
+- **附带数据集**：`eval_set/chinese_hallucination_benchmark.jsonl`——100 条中文幻觉标注样本（约 260 条声明，9 类幻觉：编造事实/张冠李戴/数据错误/时间错误等），CC-BY-4.0，详见 `eval_set/README.md`。
 
 > **定位**：本仓库当前是一个**检测器 + 回归基准**，不是学术 novelty。
 
@@ -32,7 +180,7 @@ halluc-detect bench                # 0 API quota，离线复现
 
 ```bash
 # 开发模式（仓库内）
-git clone <repo> && cd hallucc
+git clone <repo> && cd HallucC-Agent-Bench
 pip install -e .
 
 # 仅 fast 档（0 依赖）
@@ -72,7 +220,7 @@ halluc-detect detect trajectory.json --tools demo
 | A | `step, thought, action, action_input, observation, final_answer` |
 | B | `step, tool, tool_input, tool_output, agent_claim` |
 
-输出为结构化 JSON（`evaluate_trajectory().to_dict()`）：六维 `dimensions`、逐 步 `steps[].checks`、`failure_modes` 列表、`propagation` 传播链、`llm_calls`/`search_calls`（fast 档均为 0）。
+输出为结构化 JSON（`evaluate_trajectory().to_dict()`）：六维 `dimensions`、逐步 `steps[].checks`、`failure_modes` 列表、`propagation` 传播链、`llm_calls`/`search_calls`（fast 档均为 0）。
 
 ### `bench` — 跑中文基准
 
@@ -136,34 +284,13 @@ judge 仅见 `{task, trajectory}` + 工具注册表，不见作者 `expected_fai
 - **循环质疑自证**：独立 judge 盲标打破「检测器抓自家模板」质疑——若属真，recall 应趋 0，而非实测 0.857。
 - **分层递进 + 控误报**：证据不足 → `unverified`，不强行 `refuted`（与 HallucC 主线一致）。规则层只把"不确定"的项交给裁判层，避免全量 LLM 调用。
 
-
 **Phase 2（规划中）**：公开排行榜（检测器轴 + Agent 轴）。
 
 ## 许可证
 
 - **代码**：MIT（见 `LICENSE`）。
-- **基准数据集**（HallucC-Agent-Bench 100 条轨迹用例 + 期望标签）：CC-BY-4.0。
+- **基准数据集**（HallucC-Agent-Bench 100 条轨迹用例 + 期望标签；中文幻觉评测集）：CC-BY-4.0。
 
 > 两层许可：代码 MIT 便于工具被引用与二次开发；数据集 CC-BY-4.0 保留署名要求。
-
-
-
-## English summary
-
-`halluc-detect` is the open-source Phase 1 flagship of **HallucC** — a hallucination detector for LLM **agent execution trajectories** (not just text claims) plus a Chinese regression benchmark.
-
-- **Fast tier is pure-Python stdlib**: 0 LLM calls, 0 web search, offline-reproducible. The rule layer was deliberately decoupled so `import agent_pipeline` pulls no server/config/llm/search stack.
-- **Benchmark (HallucC-Agent-Bench)**: 100 Chinese agent trajectories = 20 contract regression (planted ground-truth hallucinations, recall=1.0 gate) + 80 adversarial (real distribution). Fast tier real recall=0.945 / fp_rate=0.0, 0 LLM / 0 search.
-- **Independent circularity probe**: a blind LLM-as-judge (DeepSeek temp=0, sees only {task, trajectory} — not author labels, not detector output) re-labels all 100 cases, confirming ~86% of hallucination labels + 100% of clean (specificity=1.0, zero false positives) and a **low** circularity verdict — refuting the "detector catches its own templates" concern (if true, recall would approach 0, not 0.857).
-- **12 failure-mode codes**: 10 deterministic (fast tier) + 2 LLM-only (`SCOPE_DRIFT`, `PREMATURE_STOP`).
-- **Differentiation**: bilingual (CN+EN) marker lexicon with word-boundary + JSON-scoped regex matching; CN-first multi-domain benchmark; tiered evaluation that defaults to `unverified` rather than false-positive `refuted`.
-- **Funnel**: free fast tier (this repo) → standard/deep LLM-judge tiers → HallucC paid SaaS. Phase 2 will add a public leaderboard.
-
-```bash
-pip install halluc-detect
-halluc-detect bench        # 100 cases: contract recall=1.0 (gate), adversarial recall=0.937, 0 API quota
-```
-
-Licenses: code = MIT, benchmark dataset = CC-BY-4.0.
 
 — *Phase 1 of [HallucC](https://aihcc.cloud).*
